@@ -39,3 +39,35 @@
 | 메모리 | 시간 |
 | ------ | ---- |
 | 29200  | 68 |
+
+### **3. [HL_bigger-is-greater](https://www.hackerrank.com/challenges/bigger-is-greater/problem)**
+
+#### **복습한 것:**
+단어 하나를 `list`에 `char` 단위로 넣고 싶을 때
+```python
+# list(str)
+
+>>> a = 'abcdefg'
+>>> list(a)
+['a', 'b', 'c', 'd', 'e', 'f', 'g']
+```
+
+문자열 뒤집기
+```python
+# string
+>>> string = 'thank you everyone'
+>>> string[::-1]
+'enoyreve uoy knaht'
+
+# list
+>>> list = [1, 2, 3, 4, 5, 6]
+>>> list[::-1]
+[6, 5, 4, 3, 2, 1]
+```
+리스트 병합
+```python
+>>> first = [1, 2, 3, 4]
+>>> second = [5, 6, 7, 8]
+>>> first + second
+[1, 2, 3, 4, 5, 6, 7, 8]
+```
