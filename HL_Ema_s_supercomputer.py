@@ -19,12 +19,12 @@ def twoPluses(grid):
     row = len(grid)
     col = len(grid[0])
     
-    # 가능한 가장 긴 가지 길이 (중심 제외)
+    # The longest possible branch length (excluding center)
     longest_branch_len = int((min((row, col)) - 1) // 2)
     
     exist_point = []
     
-    # 3칸이상짜리 체크
+    # Check that's more than 3 spaces.
     for branch_len in range(longest_branch_len, 0, -1):
         for r in range(branch_len, row-branch_len):
             for c in range(branch_len, col-branch_len):
@@ -40,26 +40,40 @@ def twoPluses(grid):
                             plus_available=False
                             break
                 # check whether it is already_exist
-                not_already_exist = True
+                valid_position = True
                 # exist_point is None
                 if not exist_point:
                     pass
                 else:
                     exist_r, exist_c, exist_l = exist_point[0][0], exist_point[0][1], exist_point[0][2]
-                    # if (r - l <= current_r <= r + l) -> not_already_exist = False
-                    if (exist_r - exist_l <= r <= exist_r + exist_l) or (exist_c - exist_l <= c <= exist_c + exist_l):
-                        not_already_exist = False
-                
-                if plus_available and not_already_exist:
+                    
+                    if exist_r == r:
+                        if (exist_c - exist_l - branch_len) <= c <= (exist_c + exist_l + branch_len):
+                            valid_position = False
+                    elif exist_c == c:
+                        if (exist_r - exist_l - branch_len) <= r <= (exist_r + exist_l + branch_len):
+                            valid_position = False
+                    elif ((exist_r - exist_l) <= r <= (exist_r + exist_l)) and ((exist_c - exist_l) <= c <= (exist_c + exist_l)):
+                        if ((exist_r - branch_len) <= r <= (exist_r + branch_len)) or ((exist_c - branch_len) <= c <= (exist_c + branch_len)):
+                            valid_position = False
+                        
+                if plus_available and valid_position:
                     exist_point.append([r, c, branch_len])
                 if len(exist_point) == 2:
-                    print(2)
-                    return exist_point
-                    # return (exist_point[0][2] * 4 + 1) * (exist_point[1][2] * 4 + 1)
-    # 한칸짜리 체크
-    print(1)
-    return exist_point
-    # return exist_point[0][2] * 4 + 1
+                    # print(2)
+                    # print((exist_point[0][2] * 4 + 1) * (exist_point[1][2] * 4 + 1))
+                    # return exist_point
+                    return (exist_point[0][2] * 4 + 1) * (exist_point[1][2] * 4 + 1)
+    
+    # not exist valid plus
+    if not exist_point:
+        return 1
+    
+    # One space check.
+    # print(1)
+    # print(exist_point[0][2] * 4 + 1)
+    # return exist_point
+    return exist_point[0][2] * 4 + 1
     
 if __name__ == '__main__':
 
