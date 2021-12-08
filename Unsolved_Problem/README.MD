@@ -28,7 +28,7 @@
 
 ### **1. [HL_lilys-homework](https://www.hackerrank.com/challenges/lilys-homework/problem)**
 ### **시도**
-시도 조건이 절댓값인지 모르고 오름차순으로 시도했으나 실패 -> 내림차순도 포함하여 시도했으나 몇개는 시간초과 몇개는 틀림 -> 앞에서 오름차순 연산 실행하고 정렬시켜버린것을 그대로 다시 내림차순 연산해서 `copy.deepcopy()`를 사용해서 고쳤으나 시간초과로 틀림
+시도 조건이 절댓값인지 모르고 오름차순으로 시도했으나 실패 -> 내림차순도 포함하여 시도했으나 몇개는 시간초과 몇개는 틀림 -> 앞에서 오름차순 연산 실행하고 정렬시켜버린것을 그대로 다시 내림차순 연산해서 `copy.deepcopy()`를 사용해서 고쳤으나 시간초과로 틀림 여기까지 선택정렬 사용함
 
 ### **2. [HL_fraudulent-activity-notifications](https://www.hackerrank.com/challenges/fraudulent-activity-notifications/problem)**
 ### **시도**

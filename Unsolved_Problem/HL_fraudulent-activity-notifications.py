@@ -10,6 +10,7 @@ def get_median(cnt_num, d):
         second = 0
         for i in range(len(cnt_num)):
             cnt += cnt_num[i]
+            # if the number is even, the two numbers you have to deal with are d//2 and d//2 + 1 
             if cnt == (d // 2):
                 first = i
             elif cnt > (d//2):
