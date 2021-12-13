@@ -22,7 +22,7 @@
 
 ## **2021-12-07**
 
-### **1. [BOJ 17471]](https://www.acmicpc.net/problem/17471)**
+### **1. [BOJ 17471](https://www.acmicpc.net/problem/17471)**
 
 ## **2021-12-08**
 
