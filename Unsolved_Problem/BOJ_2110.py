@@ -25,12 +25,13 @@ def can_set(norm):
 
 first = 1
 last = max
-
-while first < last:
+result = 0
+while first <= last:
     mid = (first + last) // 2
     if can_set(mid):
-        first = mid
+        first = mid + 1
+        result = mid
     else:
         last = mid - 1
 
-print(first)
+print(result)
