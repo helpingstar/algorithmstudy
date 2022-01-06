@@ -1,20 +1,22 @@
 import sys
 from collections import deque
-
+from collections import defaultdict
 n, m = map(int, sys.stdin.readline().split())
 
-ab_dic = {}
-
-for i in range(1, n+1):
-    ab_dic[i] = []
-
-entered_vertex = [False] * (n+1)
+node = defaultdict(set)
+entered_vertex = {}
+all_n = set()
 
 for _ in range(m):
     a, b = map(int, sys.stdin.readline().split())
-    ab_dic[a].append(b)
-    ab_dic[b].append(a)
-    
+    node[a].add(b)
+    node[b].add(a)
+    all_n.add(a)
+    all_n.add(b)
+
+for i in all_n:
+    entered_vertex[i] = False
+
 def bfs(x):
     if entered_vertex[x]:
         return False
@@ -23,15 +25,15 @@ def bfs(x):
     while queue:
         t = queue.popleft()
         entered_vertex[t] = True
-        for i in ab_dic[t]:
+        for i in node[t]:
             if entered_vertex[i]:
                 continue
             queue.append(i)
     return True
+
 count = 0
-for i in range(1, n+1):
-    if not entered_vertex[i]:
-        bfs(i)
+for i in all_n:
+    if bfs(i):
         count += 1
         
 print(count)
