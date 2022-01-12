@@ -1,1 +1,3 @@
-test.py
+python/test.py
+.vscode
+cpp/ElementsOfProgrammingInterviewInCpp/*.exe
