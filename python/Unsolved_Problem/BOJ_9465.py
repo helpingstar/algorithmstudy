@@ -12,11 +12,14 @@ def get_highest_score(matrix, n):
     for _ in range(2):
         score.append([0] * n)
     score[0][0], score[1][0] = matrix[0][0], matrix[1][0]
-    score[0][1], score[1][1] = matrix[0][1] + matrix[1][0], matrix[0][0] + matrix[1][1]
-    for i in range(2, n):
-        score[0][i] = max(score[1][i-2], score[1][i-1]) + matrix[0][i]
-        score[1][i] = max(score[0][i-2], score[1][i-1]) + matrix[1][i]
-    return max(score[0][n-1], score[1][n-1])
+    for i in range(2, n, 2):
+        score[0][i] = max(score[0][i-2] + matrix[1][i-1], score[1][i-2]) + matrix[0][i]
+        score[1][i] = max(score[1][i-2] + matrix[0][i-1], score[0][i-2]) + matrix[1][i]
+    if n % 2 == 0:
+        score[0][n-1] = score[0][n-2] + matrix[1][n-1]
+        score[1][n-1] = score[1][n-2] + matrix[0][n-1]
+    return max(score[0][-1], score[1][-1])
+
 
 for _ in range(t):
     matrix = []
