@@ -1,40 +1,39 @@
 import sys
-from collections import deque
-from collections import defaultdict
-n, m = map(int, sys.stdin.readline().split())
 
-node = defaultdict(set)
-entered_vertex = {}
-all_n = set()
+input = sys.stdin.readline
 
-for _ in range(m):
-    a, b = map(int, sys.stdin.readline().split())
-    node[a].add(b)
-    node[b].add(a)
-    all_n.add(a)
-    all_n.add(b)
+v, e = map(int, input().split())
+graph = [[] for _ in range(v+1)]
+parent = [i for i in range(v+1)]
+edges = []
 
-for i in all_n:
-    entered_vertex[i] = False
+for _ in range(e):
+    a, b = map(int, input().split())
+    graph[a].append(b)
+    edges.append((a, b))
 
-def bfs(x):
-    if entered_vertex[x]:
-        return False
-    queue = deque()
-    queue.append(x)
-    while queue:
-        t = queue.popleft()
-        entered_vertex[t] = True
-        for i in node[t]:
-            if entered_vertex[i]:
-                continue
-            queue.append(i)
-    return True
+def find_parent(parent, x):
+    if parent[x] != x:
+        parent[x] = find_parent(parent, parent[x])
+    return parent[x]
 
-count = 0
-for i in all_n:
-    if bfs(i):
-        count += 1
-        
-print(count)
-        
+def union_parent(parent, a, b):
+    a = find_parent(parent, a)
+    b = find_parent(parent, b)
+    if a > b:
+        parent[a] = b
+    else:
+        parent[b] = a
+
+edges.sort()
+
+for edge in edges:
+    x, y = edge
+    union_parent(parent, x, y)
+
+result = set()
+
+for i in range(1, v+1):
+    result.add(parent[i])
+
+print(len(result))
