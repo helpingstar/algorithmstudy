@@ -2,96 +2,117 @@ import sys
 from collections import deque
 
 input = sys.stdin.readline
-# 세로 : n, 가로 : m
-n, m = map(int, input().split())
 
-terrain = [list(map(int, input().split())) for _ in range(n)]
-visited = [[False] * m for _ in range(n)]
+# r : 세로 길이, c : 가로 길이
+r, c = map(int, input().split())
 
-# land[(x, y)] = n : x, y좌표는 n섬에 속한다.
-land = dict()
-landArr = []
-
+islands = [[0 for _ in range(c)] for _ in range(r)]
+arr = [list(map(int, input().split())) for _ in range(r)]
 dx = [-1, 1, 0, 0]
 dy = [0, 0, -1, 1]
-
-# 섬 구분하여 좌표 구하기, BFS
-landNum = 0
-for i in range(n):
-    for j in range(m):
-        if terrain[i][j] == 1 and not visited[i][j]:
-            q = deque([(i, j)])
-            visited[i][j] = True
-            land[(i, j)] = landNum
-            landArr.append((i, j, landNum))
-            while q:
-                x, y = q.popleft()
-                for i in range(4):
-                    nx = x + dx[i]
-                    ny = y + dy[i]
-                    if 0 <= nx < n and 0 <= ny < m and not visited[nx][ny] and terrain[nx][ny]:
-                        q.append((nx, ny))
-                        visited[nx][ny] = True
-                        land[(nx, ny)] = landNum
-                        landArr.append((nx, ny, landNum))
-            landNum += 1
-
-# 다리 제작
 edges = []
-for x, y, curLand in landArr:
-    for i in range(4):
-        dist = 0
-        nx = x + dx[i]
-        ny = y + dy[i]
-        while True:
-            if 0 <= nx < n and 0 <= ny < m:
-                # dict.get(key) : key에 대응되는 dict의 Value를 준다.
-                # land.get((dx, dy)) : (dx, dy)의 섬 번호를 반환
-                toLand = land.get((nx, ny))
-                if curLand == toLand:
-                    break
-                if toLand == None:
-                    nx += dx[i]
-                    ny += dy[i]
-                    dist += 1
+cordis = []
+
+# 방문하지 않은 island안에 들어가서 island의 각 위치를 파악하고
+# 각 위치를 이름으로 넘버링 한다.
+def bfs_islands(visited, sy, sx, island_num):
+
+    q = deque()
+    q.append((sy, sx))
+    
+    while q:
+        y, x = q.popleft()
+        for i in range(4):
+            ny = y + dy[i]
+            nx = x + dx[i]
+            if not (0 <= ny < r and 0 <= nx < c):
+                continue
+            if visited[ny][nx]:
+                continue
+            visited[ny][nx] = True
+            if arr[ny][nx] == 1:
+                islands[ny][nx] = island_num
+                q.append((ny, nx))
+                cordis.append((ny, nx, island_num))
+                
+
+# islands 의 존재를 찾는 함수
+def make_islands():
+    visited = [[False for _ in range(c)] for _ in range(r)]
+    # island의 이름
+    island_num = 1
+    # 행 탐색
+    for i in range(r):
+        # 열 탐색
+        for j in range(c):
+            # 방문하지 않았고 그곳이 섬 지형이라면
+            if not visited[i][j] and arr[i][j] == 1:
+                # 방문으로 처리
+                visited[i][j] = True
+                # 섬에 넘버링
+                islands[i][j] = island_num
+                # 섬의 (x, y, island_num) : 
+                cordis.append((i, j, island_num))
+                bfs_islands(visited, i, j, island_num)
+                island_num += 1
+    return island_num
+
+# 다리의 후보군을 찾는 함수
+def find_routes():
+    for sy, sx, island_num in cordis:
+        q = deque()
+
+        for i in range(4):
+            q.append((sy, sx))
+            visited = [[False] * c for _ in range(r)]
+            visited[sy][sx] = True
+            table = [[0] * c for _ in range(r)]
+            
+            while q:
+                y, x = q.popleft()
+                ny = y + dy[i]
+                nx = x + dx[i]
+                
+                if not (0 <= ny < r and 0 <= nx < c):
                     continue
-                if dist < 2:
-                    break
-                edges.append((dist, curLand, toLand))
-                break
-            else:
-                break
+                if visited[ny][nx]:
+                    continue
+                visited[ny][nx] = True
+                if islands[ny][nx] == 0:
+                    table[ny][nx] = table[y][x] + 1
+                    q.append((ny, nx))
+                elif islands[ny][nx] != island_num and table[y][x] >= 2:
+                    edges.append((table[y][x], island_num, islands[ny][nx]))
+                    
+n = make_islands() - 1
+find_routes()
+parent = [i for i in range(n+1)]
 
-edges.sort(reverse=True)
-
-# 크루스칼
-
-def find_parent(parent, x):
+def find(parent, x):
     if parent[x] != x:
-        parent[x] = find_parent(parent, parent[x])
+        parent[x] = find(parent, parent[x])
     return parent[x]
 
-def union_parent(parent, a, b):
-    a = find_parent(parent, a)
-    b = find_parent(parent, b)
+def union(parent, a, b):
+    a = find(parent, a)
+    b = find(parent, b)
     if a > b:
         parent[a] = b
     else:
         parent[b] = a
 
-result = 0
-cnt = landNum - 1
-parent = [i for i in range(landNum)]
+edges.sort()
+total, cnt = 0, 0
 
-while cnt:
-    try:
-        cost, a, b = edges.pop()
-    except:
-        print(-1)
-        sys.exit()
-    if find_parent(parent, a) != find_parent(parent, b):
-        union_parent(parent, a, b)
-        result += cost
-        cnt -= 1
+for cost, a, b in edges:
+    if find(parent, a) != find(parent, b):
+        union(parent, a, b)
+        total += cost
+        cnt += 1
+        if cnt == n-1:
+            break
 
-print(result)
+if cnt == n-1:
+    print(total)
+else:
+    print(-1)
