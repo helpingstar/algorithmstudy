@@ -83,6 +83,7 @@ def find_routes():
                     q.append((ny, nx))
                 elif islands[ny][nx] != island_num and table[y][x] >= 2:
                     edges.append((table[y][x], island_num, islands[ny][nx]))
+
                     
 n = make_islands() - 1
 find_routes()
