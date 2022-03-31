@@ -51,14 +51,14 @@ def find_island():
 def bfs_bridge(sy, sx, cnt):
     q = deque()
     q.append((sy, sx))
+    visited = [[False] * n for _ in range(n)]
+    table = [[0] * n for _ in range(n)]
     while q:
         y, x = q.popleft()
-        visited = [[False] * n for _ in range(n)]
         visited[y][x] = True
-        table = [[0] * n for _ in range(n)]
         for i in range(4):
             ny = y + dy[i]
-            nx = x = dx[i]
+            nx = x + dx[i]
 
             if not (0 <= ny < n and 0 <= nx < n):
                 continue
@@ -68,8 +68,9 @@ def bfs_bridge(sy, sx, cnt):
             if island[ny][nx] == 0:
                 table[ny][nx] = table[y][x] + 1
                 q.append((ny, nx))
-            elif island[ny][nx] != cnt:
+            elif island[ny][nx] != 0 and island[ny][nx] != cnt:
                 return table[y][x]
+    return 1000
                 
 def find_bridge():
     for sy, sx, cnt in cordis:
