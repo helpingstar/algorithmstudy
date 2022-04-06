@@ -26,9 +26,9 @@ for i in range(r):
 def check_board(cur_x, cur_y, dx, dy, board, color):
     nx = cur_x + dx
     ny = cur_y + dy
-    if board[ny][nx] in ['#', 'R', 'B']:
+    if board[ny][nx] == '#':
         return (cur_y, cur_x)
-    while board[ny][nx] not in ['#', 'R', 'B']:
+    while board[ny][nx] != '#':
         if board[ny][nx] == 'O':
             if color == 'R':
                 return 'R'
@@ -39,8 +39,29 @@ def check_board(cur_x, cur_y, dx, dy, board, color):
         nx = pre_x + dx
     return (pre_y, pre_x)
 
-    
-
+def same_pos(r_cur, b_cur, dy, dx):
+    r_y, r_x = r_cur
+    b_y, b_x = b_cur
+    if (dy, dx) == (0, -1):
+        if r_x < b_x:
+            return (r_y, r_x), (b_y, b_x+1)
+        else:
+            return (r_y, r_x+1), (b_y, b_x)
+    elif (dy, dx) == (0, 1):
+        if r_x < b_x:
+            return (r_y, r_x-1), (b_y, b_x)
+        else:
+            return (r_y, r_x), (b_y, b_x-1)
+    elif (dy, dx) == (-1, 0):
+        if r_y < b_y:
+            return (r_y, r_x), (b_y+1, b_x)
+        else:
+            return (r_y+1, r_x), (b_y, b_x)
+    else:
+        if r_y < b_y:
+            return (r_y-1, r_x), (b_y, b_x)
+        else:
+            return (r_y, r_x), (b_y-1, b_x)
 
 def bfs(r_pos, b_pos):
     visited_r = [[False] * c for _ in range(r)]
@@ -61,12 +82,13 @@ def bfs(r_pos, b_pos):
             b_result = check_board(b_x, b_y, dx[i], dy[i], board, 'B')
             if b_result == 'B':
                 continue
-            if r_result == b_result:
-                continue
             if r_result == 'R':
                 return cnt
             if visited_r[r_result[0]][r_result[1]]:
                 continue
+            if r_result == b_result:
+                r_result, b_result = same_pos(r_result, b_result, dy[i], dx[i])
+
             q.append((r_result, b_result, cnt+1))
             # board[r_result[0]][r_result[1]] = 'R'
             # board[b_result[0]][b_result[1]] = 'B'
