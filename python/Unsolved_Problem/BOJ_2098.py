@@ -21,6 +21,7 @@ def dfs(x, visited):
     # 여기를 뚫으면 i를 탐색한다(최소값은 보장하지 않음)
     for i in range(1, n):           # 모든 도시를 탐방
         if not graph[x][i]:         # 가는 경로가 없다면 skip
+            print(x, i)
             continue
         if visited & (1 << i):      # 이미 방문한 도시라면 skip
             continue

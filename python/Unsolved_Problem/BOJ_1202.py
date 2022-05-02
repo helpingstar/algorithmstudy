@@ -19,7 +19,6 @@ for _ in range(k):
 jews.sort()
 bags.sort()
 
-max = -1
 result = 0
 
 q = []
