@@ -12,7 +12,7 @@ for _ in range(t):
     
     graph = [[] for _ in range(n+1)]
     degree = [0] * (n+1)
-    
+    # 이게 핵심이다.
     max_board = [0] * (n+1)
     
     for _ in range(k):
@@ -30,6 +30,7 @@ for _ in range(t):
     while q:
         now = q.popleft()
         for i in graph[now]:
+            # 다음 그래프까지 걸렸던 시간을 적용한다. max_board는 그중 큰 것만 취한다.
             max_board[i] = max(max_board[i], max_board[now] + time[i])
             degree[i] -= 1
             if degree[i] == 0:
