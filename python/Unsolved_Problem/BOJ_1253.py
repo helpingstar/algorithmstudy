@@ -3,31 +3,23 @@ import sys
 input = sys.stdin.readline
 
 n = int(input())
-nums = list(map(int, input().split()))
+arr = list(map(int, input().split()))
+arr.sort()
 
-nums.sort()
-numset = set(nums)
-answer = set()
+ans = 0
 
-def solution():
-    if n == 1:
-        return 0
-    l, r = 0, 1
-    while l < r and r < n:
-        if nums[l] + nums[r] in numset and nums[l] != nums[r]:
-            if (nums[l] == 0 and nums[r] != nums[r+1]):
-                pass
-            else:
-                answer.add((l, r))
-        if r == n-1:
-            l += 1
-        elif l + 1 == r:
-            r += 1
-        elif nums[l+1] - nums[l] < nums[r+1] - nums[r]:
+for i in range(n):
+    tmp = arr[:i] + arr[i+1:]
+    l, r = 0, len(tmp) -1
+
+    while l < r:
+        t = tmp[l] + tmp[r]
+        if t == arr[i]:
+            ans += 1
+            break
+        if t < arr[i]:
             l += 1
         else:
-            r += 1
-    return len(answer)
+            r -= 1
 
-print(solution())
-
+print(ans)
