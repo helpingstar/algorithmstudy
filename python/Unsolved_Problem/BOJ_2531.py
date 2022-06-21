@@ -1,22 +1,22 @@
 import sys
-
-n, d, k, c = map(int, sys.stdin.readline().rsplit())
-arr = [int(sys.stdin.readline().rstrip()) for _ in range(n)]
-lp, rp = 0, 0
-answer = 0
-
-while lp != n:
-    rp = lp + k
-    case = set()
-    addable = True
-    for i in range(lp, rp):
-        i %= n
-        case.add(arr[i])
-        if arr[i] == c: addable = False
-
-    cnt = len(case)
-    if addable: cnt += 1
-    answer = max(answer, cnt)
-    lp += 1
-
-print(answer)
+read = sys.stdin.readline
+n, d, k, c = map(int, read().split())
+arr = [int(read()) for _ in range(n)]
+l = [0] * (d+1)
+l[c] += 1
+tmp = 1
+for i in range(k):
+    if l[arr[i]] < 1:
+        tmp += 1
+    l[arr[i]] += 1
+ans = tmp
+for ran in [range(k, n), range(k-1)]:
+    for i in ran:
+        l[arr[i-k]] -= 1
+        if l[arr[i-k]] < 1:
+            tmp -= 1
+        l[arr[i]] += 1
+        if l[arr[i]] < 2:
+            tmp += 1
+        ans = max(ans, tmp)
+print(ans)
