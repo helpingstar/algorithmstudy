@@ -1,18 +1,30 @@
-import sys
+N, M = map(int, input().split())
+arr = [list(map(int, input())) for _ in range(N)]
 
-input = sys.stdin.readline
+def bf():
+  result = 0
+  for i in range(1 << N * M):
+      total = 0
+      for row in range(N):
+          srow = 0
+          for col in range(M):
+              idx = row * M + col
+              if i & (1 << idx) != 0: srow = srow * 10 + arr[row][col]
+              else:
+                  total += srow
+                  srow = 0
+          total += srow
 
-n, m = map(int, input().split())
+      for col in range(M):
+          scol = 0
+          for row in range(N):
+              idx = row * M + col
+              if i & (1 << idx) == 0: scol = scol * 10 + arr[row][col]
+              else:
+                  total += scol
+                  scol = 0
+          total += scol
+      result = max(result, total)
+  return result
 
-board = []
-
-for _ in range(n):
-    board.append(list(map(int, input().rstrip())))
-
-x1, y1, x2, y2 = 0, 0, n, m
-
-done = False
-
-while not done:
-    if x2 - x1 > y2 - y1:
-        
+print(bf())

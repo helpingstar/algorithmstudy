@@ -16,10 +16,12 @@ def dp(num, weight):
         return
     
     board[num][weight] = 1
-
-    dp(num+1, weight)
-    dp(num+1, weight+weights[num-1])
-    dp(num+1, abs(weight-weights[num-1]))
+    if num == n_weight:
+        dp(num+1, weight)
+    else:
+        dp(num+1, weight)
+        dp(num+1, weight+weights[num])
+        dp(num+1, abs(weight-weights[num]))
 
 dp(0, 0)
 
