@@ -1,26 +1,28 @@
-import sys, collections 
-sys.setrecursionlimit(10**6) 
+import sys
 
-def dfs(cur): 
-    visited[cur] = 1 
-    for u in g[cur]: 
-        if not visited[u]: 
-            dfs(u) 
-            dp[cur][1] += dp[u][0] # 현재 마을을 우수마을로 선정 
-            dp[cur][0] += max(dp[u][0], dp[u][1]) # 현재 마을을 우수마을로 선정 X 
+sys.setrecursionlimit(10**6)
 
+input = sys.stdin.readline
 
-n = int(sys.stdin.readline().strip()) 
-cost = [0] + [int(x) for x in sys.stdin.readline().split()] 
+n = int(input())
+scores = [0] + list(map(int, input().split()))
+score_board = [[0, scores[i]] for i in range(n+1)]
+graph = [[] for _ in range(n+1)]
+visited = [False for _ in range(n+1)]
 
-visited = [0 for _ in range(n+1)] 
-dp = [[0, cost[i]]*2 for i in range(n+1)] # dp[i][0] = i마을을 선정X, dp[i][1] = i마을을 선정O 
-g = collections.defaultdict(list) 
+for _ in range(n-1):
+    a, b = map(int, input().split())
+    graph[a].append(b)
+    graph[b].append(a)
 
-for _ in range(n-1): 
-    v, u = map(int, sys.stdin.readline().split()) 
-    g[v].append(u) 
-    g[u].append(v) 
-    
-dfs(1) 
-print(max(dp[1][1], dp[1][0]))
+def dfs(now):
+    visited[now] = True
+    for i in graph[now]:
+        if not visited[i]:
+            dfs(i)
+            score_board[now][1] += score_board[i][0] # now -> 우수 마을로 선정
+            score_board[now][0] += max(score_board[i][0], score_board[i][1]) # now -> 우수마을X 
+
+dfs(1)
+
+print(max(score_board[1]))
