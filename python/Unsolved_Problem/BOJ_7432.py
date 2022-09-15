@@ -1,32 +1,32 @@
 import sys
-input = sys.stdin.readline
 from collections import OrderedDict
 
 class Node(object):
     def __init__(self, key, data=None):
         self.key = key
+        self.data = data
         self.children = {}
 
 class Trie(object):
     def __init__(self):
         self.head = Node(None)
+
     def insert(self, string):
         curr_node = self.head
-        for char in string.split("\\"):
+        for char in string:
             if char not in curr_node.children:
                 curr_node.children[char] = Node(char)
             curr_node = curr_node.children[char]
-    
+
+def print_all(head:Node, count):
+    print(' '*count + head.key)
+    for child_node in sorted(head.children.keys()):
+        print_all(head.children[child_node], count+1)
+
 n = int(input())
 trie = Trie()
-
 for _ in range(n):
-    trie.insert(input().rstrip())
+    trie.insert(input().split('\\'))
 
-def dfs(root: Node, cnt: int):
-    if root.children:
-        for child_node in sorted(root.children.values(), key=lambda x: x.key):
-            print(' '*cnt, child_node.key, sep='')
-            dfs(child_node, cnt+1)
-
-dfs(trie.head, 0)
+for child_node in sorted(trie.head.children.keys()):
+    print_all(trie.head.children[child_node], 0)
