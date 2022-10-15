@@ -4,4 +4,3 @@ class Solution:
         while p_ptr < len(p):
             now = p[p_ptr]
             if now == '.':
-                
