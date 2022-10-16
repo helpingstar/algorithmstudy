@@ -1,31 +1,29 @@
 import sys
+sys.setrecursionlimit(100000)
+input = sys.stdin.readline
 
-prefix = [1, 2, 3]
-stack = []
-postfix = []
-count = 0
 
-# for i in range(10000):
-#     try:
-#         n = int(sys.stdin.readline().strip())
-#         prefix.append(n)
+def getPostorder(nums):
+    length = len(nums)
 
-#     except:
-#         break
-    
-for i in prefix:
-    if len(stack) < 2:
-        stack.append(i)
-    elif stack[-1] < i and stack[-2] < i:
-        while len(stack) >= 2 and stack[-1] < i and stack[-2] < i:
-            postfix.append(stack.pop())
-        if len(stack) < 2:
-            stack.append(i)
-        else:
-            postfix.append(i)
-    else:
-        stack.append(i)
-while stack:
-    postfix.append(stack.pop())
+    if length <= 1:
+        return nums
 
-print(*postfix, sep='\n')
+    for i in range(1, length):
+        if nums[i] > nums[0]:
+            return getPostorder(nums[1:i]) + getPostorder(nums[i:]) + [nums[0]]
+
+    return getPostorder(nums[1:]) + [nums[0]]
+
+
+if __name__ == '__main__':
+    nums = []
+    while True:
+        try:
+            nums.append(int(input()))
+        except:
+            break
+
+    nums = getPostorder(nums)
+    for n in nums:
+        print(n)
