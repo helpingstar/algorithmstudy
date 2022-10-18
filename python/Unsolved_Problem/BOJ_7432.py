@@ -1,32 +1,48 @@
 import sys
-from collections import OrderedDict
+from collections import deque
 
-class Node(object):
+input = sys.stdin.readline
+
+class Node:
     def __init__(self, key, data=None):
         self.key = key
         self.data = data
         self.children = {}
 
-class Trie(object):
+class Trie:
     def __init__(self):
         self.head = Node(None)
 
-    def insert(self, string):
+    def insert(self, path):
         curr_node = self.head
-        for char in string:
-            if char not in curr_node.children:
-                curr_node.children[char] = Node(char)
-            curr_node = curr_node.children[char]
+        for file in path:
+            if file not in curr_node.children:
+                curr_node.children[file] = Node(file)
+            curr_node = curr_node.children[file]
 
-def print_all(head:Node, count):
-    print(' '*count + head.key)
-    for child_node in sorted(head.children.keys()):
-        print_all(head.children[child_node], count+1)
+    def search(self, path):
+        curr_node = self.head
+        for file in path:
+            if file in curr_node.children:
+                curr_node = curr_node.children[file]
+            else:
+                return False
+        if curr_node.data != None:
+            return True
 
+
+def dfs_node(node:Node, depth:int):
+    print(' '*depth, node.key, sep='')
+    for child in sorted(node.children):
+        dfs_node(node.children[child], depth+1)
+
+
+
+path_list = []
 n = int(input())
 trie = Trie()
 for _ in range(n):
-    trie.insert(input().split('\\'))
+    trie.insert(input().rstrip().split('\\'))
 
-for child_node in sorted(trie.head.children.keys()):
-    print_all(trie.head.children[child_node], 0)
+for node in sorted(trie.head.children):
+    dfs_node(trie.head.children[node], 0)
