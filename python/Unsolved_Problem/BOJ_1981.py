@@ -1,59 +1,37 @@
-# 배열에서의 이동
 import sys
-input= sys.stdin.readline
 from collections import deque
-N=int(input().rstrip())
-dx=[0,1,0,-1]
-dy=[1,0,-1,0]
-board=[]
-numLst=set()
-for i in range(N):
-    tmp=list(map(int,input().split()))
-    for value in tmp:
-        numLst.add(value)
-    board.append(tmp)
-# 정렬된 numLST에 투포인터라는 개념을 이용한다.
-numLst=sorted(list(numLst))
-visited=[[0 for _ in range(N)]for _ in range(N)]
-visited_cnt=0
 
-def solve():
-    low,high=0,0
-    ans=sys.maxsize
-    while low<len(numLst) and high<len(numLst):
-        # bfs로 탐색햇을 때, 중간지점들이 내가 정한 최소/최대 값 범위에 있는지 확인 
-        if bfs(numLst[low],numLst[high]):
-            if low==high:
-                print(0)
-                return
-            #무사히 n-1,n-1에 도달했다면, 내가 정한 최소/최대값의 범위를 줄인다. 
-            else:
-                ans=min(ans,abs(numLst[high]-numLst[low]))
-                low +=1
-        #만약 도달하지 못했다면, 최댓값을 늘려서, 탐색범위를 늘려본다.
-        else:
-            high+=1
-    print(ans)
+input = sys.stdin.readline
 
-def bfs(low,high):
-    global visited,visited_cnt
-    if board[0][0] < low or board[0][0] > high:
-        return False
-    visited_cnt+=1
-    visited[0][0] =visited_cnt
-    dq=deque([(0,0)])
-    while dq:
-        y,x=dq.popleft()
-        if y==N-1 and x==N-1:
-            return True
-        for k in range(4):
-            ny=y+dy[k]
-            nx=x+dx[k]
-            if not (0<=ny<N and 0<=nx<N):
+dx = (-1, 1, 0, 0)
+dy = (0, 0, -1, 1)
+
+n = int(input())
+
+board = [list(map(int, input().split())) for _ in range(n)]
+
+def bfs(x, y):
+    ans = 300
+    q = deque()
+    q.append((board[x][y], board[x][y], x, y, []))
+    while q:
+        n_min, n_max, x, y, trace = q.popleft()
+        if x == n-1 and y == n-1:
+            ans = min(ans, n_max - n_min)
+
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            if (nx, ny) in trace:
                 continue
-            if visited[ny][nx] !=visited_cnt and low<=board[ny][nx]<=high:
-                dq.append((ny,nx))
-                visited[ny][nx] = visited_cnt
-    return False
+            if not (0 <= nx < n and 0 <= ny < n):
+                continue
+            temp_min = min(n_min, board[nx][ny])
+            temp_max = max(n_max, board[nx][ny])
+            if (temp_max - temp_min) > ans:
+                continue
 
-solve()
+            q.append((temp_min, temp_max, nx, ny, trace + [(nx, ny)]))
+    return ans
+
+print(bfs(0, 0))

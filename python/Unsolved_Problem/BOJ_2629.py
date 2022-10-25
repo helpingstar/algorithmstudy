@@ -4,36 +4,30 @@ input = sys.stdin.readline
 
 n_weight = int(input())
 weights = list(map(int, input().split()))
-n_target = int(input())
-targets = list(map(int, input().split()))
+n_ball = int(input())
+balls = list(map(int, input().split()))
 
-board = [[0 for _ in range(i*500 + 1)] for i in range(n_weight+1)]
+check = set()
+def dp(n_arr, arr):
+    if n_arr == 1:
+        return set(arr)
 
-def dp(num, weight):
-    if num > n_weight:
-        return
-    if board[num][weight]:
-        return
-    
-    board[num][weight] = 1
-    if num == n_weight:
-        dp(num+1, weight)
+    if tuple(sorted(arr)) in check:
+        return set()
     else:
-        dp(num+1, weight)
-        dp(num+1, weight+weights[num])
-        dp(num+1, abs(weight-weights[num]))
+        check.add(tuple(sorted(arr)))
 
-dp(0, 0)
+    ans = set(arr)
+    for i in range(n_arr-1):
+        for j in range(i+1, n_arr):
+            ans = ans.union(dp(n_arr-1, arr[:i] + arr[i+1:j] + arr[j+1:] + [arr[i] + arr[j]]))
+            ans = ans.union(dp(n_arr-1, arr[:i] + arr[i+1:j] + arr[j+1:] + [abs(arr[i] - arr[j])]))
+    return ans
 
-ans = []
+result = dp(n_weight, weights)
 
-for t in targets:
-    if t > sum(weights):
-        ans.append('N')
-        continue
-    if board[n_weight][t]:
-        ans.append('Y')
+for ball in balls:
+    if ball in result:
+        print('Y', end=' ')
     else:
-        ans.append('N')
-
-print(*ans)
+        print('N', end=' ')
