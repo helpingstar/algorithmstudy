@@ -2,22 +2,24 @@ import sys
 import heapq
 from collections import deque
 
-input = sys.stdin.readline
 INF = sys.maxsize
 
-n_nodes, n_edges = map(int, input().split())
+input = sys.stdin.readline
 
-graph = [[] for _ in range(n_nodes+1)]
+v, e = map(int, input().split())
 
-for _ in range(n_edges):
+graph = [[] for _ in range(v+1)]
+
+for _ in range(e):
     a, b, c = map(int, input().split())
     graph[a].append((b, c))
     graph[b].append((a, c))
+    
 
 def dijkstra(start):
-    q = []
-    distance = [INF] * (n_nodes + 1)
+    distance = [INF] * (v+1)
     distance[start] = 0
+    q = []
     heapq.heappush(q, (0, start))
     while q:
         dist, now = heapq.heappop(q)
@@ -26,21 +28,24 @@ def dijkstra(start):
         for next, new_dist in graph[now]:
             cost = dist + new_dist
             if distance[next] > cost:
-                heapq.heappush(q, (cost, next))
                 distance[next] = cost
+                heapq.heappush(q, (cost, next))
     return distance
 
-distance_from_2 = dijkstra(2)
+dist_2 = dijkstra(2)
 
-road = [0] * (n_nodes + 1)
-road[2] = 1
+def bfs():
+    ans = 0
+    q = deque()
+    q.append(1)
+    while q:
+        now = q.popleft()
+        if now == 2:
+            ans += 1
+            continue
+        for next, _ in graph[now]:
+            if dist_2[next] < dist_2[now]:
+                q.append(next)
+    return ans
 
-def dp(x):
-    if road[x] == 0:
-        for next, _ in graph[x]:
-            if distance_from_2[next] < distance_from_2[x]:
-                road[x] += dp(next)
-    return road[x]
-
-print(dp(1))
-
+print(bfs())
