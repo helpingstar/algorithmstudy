@@ -2,7 +2,7 @@ from typing import List
 
 class Solution:
     def setZeroes(self, matrix: List[List[int]]) -> None:
-        n_row, n_col = len(matrix), len(matrix[0])
+        n_row, n_col = len(matrix), len(matrix[0]) 
         print(f'debug {n_row}, {n_col}')
         row_zero = [False] * n_row
         col_zero = [False] * n_col
