@@ -17,7 +17,7 @@ for _ in range(m):
 
 first, last = map(int, input().split())
 
-    
+
 def dijkstra(start):
     q = []
     heapq.heappush(q, (0, start, [start]))
