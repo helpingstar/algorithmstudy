@@ -35,7 +35,7 @@ for i in range(1, n+1):
     graph[i] += temp[1:]
 
 for i in range(1, n//2 + 1):
-    combis = list(itertools.combinations(range(1, n+1), i))
+    combis = itertools.combinations(range(1, n+1), i)
 
     for combi in combis:
         sum1, v1 = bfs(combi)
