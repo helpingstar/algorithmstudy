@@ -1,37 +1,31 @@
 from typing import List
-from collections import deque
-
-dx = (-1, 1, 0, 0)
-dy = (0, 0, -1, 1)
 
 class Solution:
     def exist(self, board: List[List[str]], word: str) -> bool:
-        R, C = len(board), len(board[0])
+        rows, cols = len(board), len(board[0])
+        path = set() # to make sure not to revisit the previous path
 
-        def dfs(row, col, word):
-            if not word:
+        def dfs(r, c, i): # (current r, current c, current character)
+            if i == len(word):
                 return True
-            origin = board[row][col]
-            board[row][col] = '#'
-            for i in range(4):
-                nx = x + dx[i]
-                ny = y + dy[i]
-            for r, c in (
-                    (row+1, col), (row-1, col), (row, col+1), (row, col-1)):
-                if (0 <= r < R and 0 <= c < C and
-                        board[r][c] == word[0] and dfs(r, c, word[1:])):
-                    return True
-            board[row][col] = origin
+            if (r < 0 or c < 0 or r >= rows or c >= cols or
+                word[i] != board[r][c] or
+                (r, c) in path):
+                return False
 
-        for row in range(R):
-            for col in range(C):
-                if (board[row][col] == word[0] and
-                        dfs(row, col, word[1:])):
-                    return True
+            path.add((r, c))
+            res = (dfs(r + 1, c, i + 1) or
+                   dfs(r - 1, c, i + 1) or
+                   dfs(r, c + 1, i + 1) or
+                   dfs(r, c - 1, i + 1))
+
+            # initialize path for next process
+            path.remove((r, c))
+            return res
+
+        for r in range(rows):
+            for c in range(cols):
+                # start process only if (value in cell) == (first char of word)
+                if board[r][c] == word[0]:
+                    if dfs(r, c, 0): return True
         return False
-
-
-board = [["A","A","A","A","A","A"],["A","A","A","A","A","A"],["A","A","A","A","A","A"],["A","A","A","A","A","A"],["A","A","A","A","A","A"],["A","A","A","A","A","A"]]
-word = "AAAAAAAAAAAAAAB"
-a = Solution()
-print(a.exist(board, word))
