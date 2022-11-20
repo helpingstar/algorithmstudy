@@ -3,80 +3,73 @@ from collections import deque
 
 input = sys.stdin.readline
 
-n = int(input())
-
-island = [[0] * n for _ in range(n)]
-arr = []
 dx = [-1, 1, 0, 0]
 dy = [0, 0, -1, 1]
-cordis = []
-bridge_length = []
 
-for _ in range(n):
-    arr.append(list(map(int, input().split())))
-
-def bfs_island(y, x, visited, island_cnt):
+def check_region(i, j, count):
     q = deque()
-    q.append((y, x))
+    q.append([i, j])
+    visited[i][j] = True
+    board[i][j] = count
+
     while q:
-        y, x = q.popleft()
+        x, y = q.popleft()
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            if not (0 <= ny < n and 0 <= nx < n):
+            if not (0 <= nx < n and 0 <= ny < n):
                 continue
-            if visited[ny][nx]:
+            if visited[nx][ny]:
                 continue
-            visited[ny][nx] = True
-            if arr[ny][nx] == 1:
-                cordis.append((ny, nx, island_cnt)) 
-                island[ny][nx] = island_cnt
-                q.append((ny, nx))
-            
+            if board[nx][ny] == 1:
+                visited[nx][ny] = True
+                board[nx][ny] = count
+                q.append([nx, ny])
 
-def find_island():
-    visited = [[False for _ in range(n)] for _ in range(n)]
-    island_cnt = 1
-    # i : row, j : column
+def bfs2(my_region):
+    global answer
+    dist = [[-1] * n for _ in range(n)] # 거리가 저장될 배열
+    # my_region의 땅 리스트
+    q = deque()
+
     for i in range(n):
         for j in range(n):
-            if not visited[i][j] and arr[i][j] == 1:
-                visited[i][j] = True
-                cordis.append((i, j, island_cnt))
-                island[i][j] = island_cnt
-                bfs_island(i, j, visited, island_cnt)
-                island_cnt += 1
-    return island_cnt
+            if board[i][j] == my_region:
+                q.append([i, j])
+                dist[i][j] = 0
 
-def bfs_bridge(sy, sx, cnt):
-    q = deque()
-    q.append((sy, sx))
-    visited = [[False] * n for _ in range(n)]
-    table = [[0] * n for _ in range(n)]
     while q:
-        y, x = q.popleft()
-        visited[y][x] = True
+        x, y = q.popleft()
         for i in range(4):
-            ny = y + dy[i]
             nx = x + dx[i]
-
-            if not (0 <= ny < n and 0 <= nx < n):
+            ny = y + dy[i]
+            # 갈 수 없는 곳이면 continue
+            if not (0 <= nx < n and 0 <= ny < n):
                 continue
-            if visited[ny][nx]:
+            if board[nx][ny] == my_region:
                 continue
-            visited[ny][nx] = True
-            if island[ny][nx] == 0:
-                table[ny][nx] = table[y][x] + 1
-                q.append((ny, nx))
-            elif island[ny][nx] != 0 and island[ny][nx] != cnt:
-                return table[y][x]
-    return 1000
-                
-def find_bridge():
-    for sy, sx, cnt in cordis:
-        bridge_length.append(bfs_bridge(sy, sx, cnt))
+            # 다른 땅을 만나면 기존 답과 비교하여 짧은 거리 선택
+            if board[nx][ny] > 0:
+                return dist[x][y]
+            # 바다를 만나면 dist를 1씩 늘린다.
+            if board[nx][ny] == 0 and dist[nx][ny] == -1:
+                dist[nx][ny] = dist[x][y] + 1
+                q.append([nx, ny])
 
+n = int(input())
 
-island_num = find_island() - 1
-find_bridge()
-print(min(bridge_length))
+board = [list(map(int, input().split())) for _ in range(n)]
+visited = [[False] * n for _ in range(n)]
+count = 1
+answer = sys.maxsize
+
+for i in range(n):
+    for j in range(n):
+        if not visited[i][j] and board[i][j] == 1:
+            check_region(i, j, count)
+            count += 1
+
+for my_region in range(1, count):
+    answer = min(answer, bfs2(my_region))
+
+print(answer)
