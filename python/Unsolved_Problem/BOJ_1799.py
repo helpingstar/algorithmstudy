@@ -28,7 +28,7 @@ def is_promising(x):
             return False
     return True
 
-def dp(x, cnt):    
+def dp(x, cnt):
     global ans
     global n
     if n == 1:
@@ -48,7 +48,7 @@ def dp(x, cnt):
                     dp(x+1, cnt+1)
             shop_list[x] = [-1, -1]
             dp(x+1, cnt)
-            
+
 dp(0, 0)
-                
+
 print(ans)
