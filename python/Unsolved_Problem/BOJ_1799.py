@@ -1,54 +1,55 @@
-import sys
+n=int(input())
 
-input = sys.stdin.readline
+chess_map=[]
+black=[]
+white=[]
+color=[[0]*n for _ in range(n)]
 
-n = int(input())
+for i in range(n):
+    chess_map.append(list(map(int, input().split())))
+    for j in range(n):
+        # True가 검은색
+        if chess_map[i][j]==1 and (i + j) % 2 == 0:
+            black.append((i,j))
+            color[i][j] = 1
+        # False가 흰색
+        if chess_map[i][j]==1 and (i + j) % 2 == 1:
+            white.append((i,j))
+            color[i][j] = 0
 
-board = []
-zero_pos = []
-ans = 0
-re_board = [[] for _ in range(2*n-1)]
-shop_list = [[-1, -1] for _ in range(2*n-1)]
+# 검은색인 경우
+Bcnt=0
+# 흰색인 경우
+Wcnt=0
 
-for _ in range(n):
-    board.append(list(map(int, input().split())))
+isused01=[0]*(n*2-1)
+isused02=[0]*(n*2-1)
 
-for r in range(n):
-    for c in range(n):
-        if board[r][c] == 1:
-            re_board[r-c + (n-1)].append((r, c))
-
-def is_promising(x):
-    nr, nc = shop_list[x]
-    for i in range(x):
-        er, ec = shop_list[i]
-        if er == -1 and ec == -1:
-            continue
-        if (nr+nc) == (er+ec):
-            return False
-    return True
-
-def dp(x, cnt):
-    global ans
-    global n
-    if n == 1:
-        if board[0][0] == 1:
-            ans = 1
+def fun(bishop,index,count):
+    global Bcnt, Wcnt
+    if index==len(bishop):
+        rx,ry=bishop[index-1]
+        # 블랙이면 Bcnt 최대값
+        if color[rx][ry]:
+            Bcnt=max(Bcnt,count)
+        # 흰색이면 Wcnt 최대값
         else:
-            ans = 0
-    if x == 2*n-1:
-        ans = max(cnt, ans)
+            Wcnt=max(Wcnt,count)
         return
+
+    x,y=bishop[index]
+    if isused01[x+y] or isused02[x-y+n-1]:
+        fun(bishop,index+1,count)
     else:
-        # lower bound
-        if (2*n-1 - x + cnt) > ans:
-            for r, c in re_board[x]:
-                shop_list[x] = [r, c]
-                if is_promising(x):
-                    dp(x+1, cnt+1)
-            shop_list[x] = [-1, -1]
-            dp(x+1, cnt)
+        isused01[x+y]=1
+        isused02[x-y+n-1]=1
+        fun(bishop,index+1,count+1)
+        isused01[x+y]=0
+        isused02[x-y+n-1]=0
+        fun(bishop,index+1,count)
 
-dp(0, 0)
-
-print(ans)
+if len(black)>0:
+    fun(black,0,0)
+if len(white)>0:
+    fun(white,0,0)
+print(Bcnt+Wcnt)
