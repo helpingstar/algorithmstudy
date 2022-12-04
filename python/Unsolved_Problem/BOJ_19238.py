@@ -1,78 +1,101 @@
+import sys
 from collections import deque
 
-n, m, energy = map(int, input().split(' '))
-graph = [list(map(int, input().split(' '))) for _ in range(n)]
-s_x, s_y = map(int, input().split(' '))
-people = [list(map(int, input().split(' '))) for _ in range(m)]
+input = sys.stdin.readline
 
-d_x = [-1, 0, 1, 0]
-d_y = [0, 1, 0, -1]
+dx = (-1, 1, 0, 0)
+dy = (0, 0, -1, 1)
 
+n_map, n_client, n_fuel = map(int ,input().split())
 
-def bfs(s_x, s_y):
-    visited = [[-1] * n for _ in range(n)]
-    queue = deque()
-    queue.append((s_x, s_y))
-    visited[s_x][s_y] = 0
+board = [list(map(int, input().split())) for _ in range(n_map)]
+client_map = [[0] * n_map for _ in range(n_map)]
+visit_client = [False] * (n_client+1)
 
-    while queue:
-        pop_x, pop_y = queue.popleft()
+start_r, start_c = map(int, input().split())
 
+for i in range(1, n_client+1):
+    cl_s_r, cl_s_c, cl_e_r, cl_e_c = map(int, input().split())
+    client_map[cl_s_r-1][cl_s_c-1], client_map[cl_e_r-1][cl_e_c-1] = i, -i
+
+# print(f'[debug]  client_map')
+# for i in client_map:
+#     print(*i)
+# print('------------------------')
+
+def get_client(start_r, start_c, rest_fuel):
+    q = deque()
+    q.append((start_r, start_c, rest_fuel))
+    visited = set()
+    visited.add((start_r, start_c))
+    fuel_flag = 0
+    client_list = []
+    while q:
+        x, y, p_fuel = q.popleft()
+        # print(f'[debug]  x:{x}, y:{y}, p_fuel:{p_fuel}')
+        if p_fuel < 0:
+            return -1, -1, -1, -1
         for i in range(4):
-            n_x, n_y = pop_x + d_x[i], pop_y + d_y[i]
-
-            if n_x < 0 or n_x >= n or n_y < 0 or n_y >= n:
+            nx = x + dx[i]
+            ny = y + dy[i]
+            if not (0 <= nx < n_map and 0 <= ny < n_map):
                 continue
-            if graph[n_x][n_y] == 1 or visited[n_x][n_y] != -1:
+            if (nx, ny) in visited:
                 continue
+            if board[nx][ny]: # wall
+                continue
+            if p_fuel < fuel_flag:
+                continue
+            if client_map[nx][ny] > 0 and not visit_client[client_map[nx][ny]]:
+                fuel_flag = p_fuel
+                client_list.append((nx, ny))
+                visited.add((nx, ny))
+            else:
+                q.append((nx, ny, p_fuel - 1))
+                visited.add((nx, ny))
+    if not client_list:
+        return -1, -1, -1, -1
+    client_list.sort()
+    # print(f'[debug]  client_list: {client_list}')
+    next_client = client_map[client_list[0][0]][client_list[0][1]]
+    visit_client[next_client] = True
+    # print(f'[debug]  visit_client: {visit_client}')
+    return client_list[0][0], client_list[0][1], fuel_flag-1, next_client
 
-            visited[n_x][n_y] = visited[pop_x][pop_y] + 1
-            queue.append((n_x, n_y))
+def client_to_dest(start_r, start_c, n_fuel, client):
+    q = deque()
+    q.append((start_r, start_c, n_fuel))
+    visited = set()
+    visited.add((start_r, start_c))
+    while q:
+        x, y, p_fuel = q.popleft()
+        if p_fuel == 0:
+            return -1, -1, -1
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            if not (0 <= nx < n_map and 0 <= ny < n_map):
+                continue
+            if (nx, ny) in visited:
+                continue
+            if board[nx][ny]:  # wall
+                continue
+            if client_map[nx][ny] == -client:
+                return nx, ny, p_fuel-1 + (n_fuel - p_fuel + 1)*2
 
-    return visited
-
-
-def check_dist(visited: list, people: list):
-    i = 0
-    for p_x, p_y, a_x, a_y in people:
-        people[i].append(visited[p_x - 1][p_y - 1])
-        i += 1
-
-    people.sort(key=lambda x: (-x[4], -x[0], -x[1]))
-
-
-def solve(s_x, s_y):
-    global energy
-    while people:
-        visitied = bfs(s_x - 1, s_y - 1)
-        check_dist(visitied, people)
-        p_x, p_y, a_x, a_y, dist = people.pop()
-
-        for temp in people:
-            temp.pop()
-
-        visitied = bfs(p_x - 1, p_y - 1)
-        dist2 = visitied[a_x - 1][a_y - 1]
-        s_x, s_y = a_x, a_y
-
-        if dist == -1 or dist2 == -1:
-            print(-1)
-            return
-
-        energy -= dist
-        if energy < 0:
-            break
-
-        energy -= dist2
-        if energy < 0:
-            break
-
-        energy += dist2 * 2
-
-    if energy < 0:
-        print(-1)
-    else:
-        print(energy)
+            q.append((nx, ny, p_fuel-1))
 
 
-solve(s_x, s_y)
+def solution():
+    sol_start_r, sol_start_c, sol_fuel = start_r, start_c, n_fuel
+    for i in range(1, n_client+1):
+        next_r, next_c, next_fuel, client = get_client(sol_start_r, sol_start_c, sol_fuel)
+        # print(f'[debug]  get_client -> {(next_r, next_c, next_fuel, client)}')
+        if next_r == -1:
+            return -1
+        sol_start_r, sol_start_c, sol_fuel = client_to_dest(next_r, next_c, next_fuel, client)
+        if sol_start_c == -1:
+            return -1
+    return sol_fuel
+
+print(solution())
