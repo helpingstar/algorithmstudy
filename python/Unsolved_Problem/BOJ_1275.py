@@ -1,33 +1,49 @@
 import sys
 
 input = sys.stdin.readline
-from collections import deque
 
-
-n_number, n_turn = map(int, input().split())
+n, q = map(int, input().split())
 
 nums = [0] + list(map(int, input().split()))
 
-def get_sum(left, right):
-    result = 0
-    q = deque()
-    q.append((1, len(nums)))
-    while q:
-        nleft, nright = q.popleft()
+tree = [0] * (n * 4)
 
-        print(f'[debug]  nleft: {nleft}, nright: {nright}')
-        nmid = (nleft + nright) // 2
-        if nright < left or right < nleft:
-            continue
+def assign_tree(start, end, node):
+    if start == end:
+        tree[node] = nums[start]
+        return tree[node]
+    mid = start + (end - start) // 2
+    tree[node] = assign_tree(start, mid, node*2) + assign_tree(mid+1, end, node*2+1)
+    return tree[node]
 
-        if left <= nleft and nright <= right:
-            result += sum(nums[nleft:nright+1])
-        else:
-            q.append((nleft, nmid))
-            q.append((nmid+1, nright))
-    return result
+def get_sum(start, end, node, left, right):
+    # print(f'[debug]  {start, end, node, left, right}')
+    if left <= start and end <= right:
+        return tree[node]
+    if end < left or right < start:
+        return 0
+    mid = start + (end - start) // 2
+    return get_sum(start, mid, node*2, left, right) + \
+        get_sum(mid+1, end, node*2+1, left, right)
 
-for _ in range(n_turn):
-    x, y, a, b = map(int, input().split())
-    print(get_sum(x, y))
-    nums[a] = b
+def update_diff(start, end, node, diff, index):
+    # print(f'[debug]  {start, end, node, diff, index}')
+    if index < start or end < index:
+        return
+    tree[node] += diff
+    if start == end:
+        return
+    mid = start + (end-start) // 2
+    update_diff(start, mid, node*2, diff, index)
+    update_diff(mid+1, end, node*2+1, diff, index)
+
+assign_tree(1, n, 1)
+
+# print(tree)
+
+for _ in range(q):
+    a, b, c, d = map(int, input().split())
+    a, b = min(a, b), max(a, b)
+    print(get_sum(1, n, 1, a, b))
+    update_diff(1, n, 1, d - nums[c], c)
+    nums[c] = d
