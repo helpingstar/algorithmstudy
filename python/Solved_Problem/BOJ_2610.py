@@ -31,7 +31,8 @@ def union_parent(parent, a, b):
         parent[b] = a
 
 for a, b in edges:
-    union_parent(parent, a, b)
+    if find_parent(parent, a) != find_parent(parent, b):
+        union_parent(parent, a, b)
 
 def dijkstra(start):
     q = []
@@ -59,8 +60,9 @@ def dijkstra(start):
 committee = defaultdict(list)
 
 for i in range(1, n_member+1):
-    committee[parent[i]].append(i)
+    committee[find_parent(parent, i)].append(i)
     
+# print(parent)
 print(len(committee))
 ans = []
 for i, members in committee.items():
