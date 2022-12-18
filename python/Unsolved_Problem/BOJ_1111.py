@@ -1,33 +1,40 @@
-if __name__ == "__main__":
+import sys
+
+input = sys.stdin.readline
+
+def solution():
     n = int(input())
-    array = list(map(int, input().split()))
-
-    # 모든 수가 같으면 A 출력
+    nums = list(map(int, input().split()))
     if n == 1:
-        print("A")
-    elif n == 2:
-        if array[0] == array[1]:
-            print(array[0])
+        return 'A'
+    if n == 2:
+        if nums[0] == nums[1]:
+            return nums[0]
+        # elif nums[0] == 0:        # 0, 4는 -> a: n, b:4 가능하므로 'A'
+        #     return nums[1] * 2
         else:
-            print("A")
-    else:
-        if array[1] - array[0] == 0:
+            return 'A'
+
+    x = nums[1] - nums[0]
+    y = nums[2] - nums[1]
+
+    if x == 0 or y == 0:
+        if x == 0 and y == 0:
             a = 1
-            b = 0  # b = array[1] - array[0] * a이기 때문에
+            b = 0
         else:
-            a = (array[2] - array[1]) // (array[1] - array[0])
-            b = array[1] - array[0] * a
-
-        # a, b값이 패턴을 만족시키는지 확인
-        flag = True
-        for i in range(1, n):
-            if array[i] == array[i - 1] * a + b:
-                continue
+            if y == 0:
+                a = 0
+                b = nums[1]
             else:
-                flag = False
-                break
+                return 'B'
+    else:
+        a = y // x
+        b = nums[1] - (nums[0] * a)
 
-        if flag:
-            print(array[n - 1] * a + b)
-        else:
-            print("B")
+    for i in range(len(nums)-1):
+        if nums[i] * a + b != nums[i+1]:
+            return 'B'
+    return nums[len(nums) - 1] *a + b
+
+print(solution())
