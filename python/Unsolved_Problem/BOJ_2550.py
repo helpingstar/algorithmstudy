@@ -2,26 +2,27 @@ import sys
 import bisect
 input = sys.stdin.readline
 
+n_bulb = int(input())
 
-n = int(input())
-INF = 10001
 left = list(map(int, input().split()))
 right = list(map(int, input().split()))
 
-mem = [INF] * n
-ans_cnt = 0
-ans = []
+right_to_index = [-1] * (n_bulb + 1)
+for i, num in enumerate(right):
+    right_to_index[num] = i
 
-for r in right:
-    l_idx = left.index(r)
-    mem_idx = bisect.bisect_left(mem, l_idx)
-    if l_idx < mem[mem_idx]:
-        if mem[mem_idx] == INF:
-            ans = mem[:mem_idx] + [l_idx]
-        mem[mem_idx] = l_idx
+dp = []
+num_pos = []
 
-print(len(ans))
-real_ans = []
-for i in ans:
-    real_ans.append(left[i])
-print(*sorted(real_ans))
+for i in left:
+    pos = bisect.bisect_left(dp, right_to_index[i])
+    if pos == len(dp):
+        dp.append(right_to_index[i])
+        num_pos.append(i)
+    else:
+        dp[pos] = right_to_index[i]
+        if pos == len(dp) - 1:
+            num_pos[pos] = i
+
+print(len(dp))
+print(*sorted(num_pos))
