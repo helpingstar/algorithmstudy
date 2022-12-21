@@ -1,47 +1,46 @@
+def str_to_sec(string):
+    hour = int(string[:2])
+    min = int(string[3:5])
+    sec = int(string[-2:])
+
+    return ((hour * 60) + min) * 60 + sec
+
+def sec_to_str(time):
+    sec = time % 60
+    time //= 60
+    min = time % 60
+    time //= 60
+    hour = time
+
+    return f'{hour:02d}:{min:02d}:{sec:02d}'
+
 def solution(play_time, adv_time, logs):
-    play_time = str_to_int(play_time)        # 1
-    adv_time = str_to_int(adv_time)               
-    all_time = [0 for i in range(play_time + 1)]
+    END = str_to_sec(play_time)
+    adv_interval = str_to_sec(adv_time)
+    played = [0] * (END + 1)
+    for log in logs:
+        start = str_to_sec(log[:8])
+        end = str_to_sec(log[-8:])
 
-    for l in logs:                           # 2
-        start, end = l.split('-')
-        start = str_to_int(start)
-        end = str_to_int(end)
-        all_time[start] += 1
-        all_time[end] -= 1
+        played[start] += 1
+        played[end] -= 1
+    for i in range(END+1):
+        played[i] += played[i-1]
 
-    for i in range(1, len(all_time)):       # 3
-        all_time[i] = all_time[i] + all_time[i - 1]
+    start_point = 0
+    sum_people = 0
+    for i in range(adv_interval):
+        sum_people += played[i]
 
-    for i in range(1, len(all_time)):       # 4
-        all_time[i] = all_time[i] + all_time[i - 1]
+    max_people = sum_people
 
-    most_view = 0                           # 5
-    max_time = 0                          
-    for i in range(adv_time - 1, play_time):
-        if i >= adv_time:
-            if most_view < all_time[i] - all_time[i - adv_time]:
-                most_view = all_time[i] - all_time[i - adv_time]
-                max_time = i - adv_time + 1
-        else:
-            if most_view < all_time[i]:
-                most_view = all_time[i]
-                max_time = i - adv_time + 1
+    for i in range(1, END - adv_interval+1):
+        sum_people -= played[i-1]
+        sum_people += played[i + adv_interval-1]
 
-    return int_to_str(max_time)
+        if sum_people > max_people:
+            max_people = sum_people
+            start_point = i
 
-
-def str_to_int(time):
-    h, m, s = time.split(':')
-    return int(h) * 3600 + int(m) * 60 + int(s)
-
-
-def int_to_str(time):
-    h = time // 3600
-    h = '0' + str(h) if h < 10 else str(h)
-    time = time % 3600
-    m = time // 60
-    m = '0' + str(m) if m < 10 else str(m)
-    time = time % 60
-    s = '0' + str(time) if time < 10 else str(time)
-    return h + ':' + m + ':' + s
+    answer = sec_to_str(start_point)
+    return answer
