@@ -1,18 +1,38 @@
 import sys
+from collections import defaultdict
 
 input = sys.stdin.readline
 
-board = [[0] * 15 for _ in range(15)]
-for i in range(15):
-    board[0][i] = i
+n, m, budget = map(int, input().split())
+dic = defaultdict(int)
 
-for r in range(1, 15):
-    for c in range(1, 15):
-        board[r][c] = board[r-1][c] + board[r][c-1]
+h_top, h_bottom = 0, 1000
 
-T = int(input())
-for _ in range(T):
-    k = int(input())
-    n = int(input())
+for _ in range(n):
+    line = list(map(int, input().split()))
+    for num in line:
+        dic[num] += 1
+        h_top = max(h_top, num)
+        h_bottom = min(h_bottom, num)
+# area = n * m
+n_top = dic[h_top]
+n_bottom = dic[h_bottom]
 
-    print(board[k][n])
+time = 0
+while h_bottom < h_top:
+    if n_bottom <= 2 * n_top and n_bottom <= budget:
+        budget -= n_bottom
+        time += n_bottom
+
+        h_bottom += 1
+        if h_bottom in dic:
+            n_bottom += dic[h_bottom]
+    else:
+        budget += n_top
+        time += 2 * n_top
+
+        h_top -= 1
+        if h_top in dic:
+            n_top += dic[h_top]
+
+print(time, h_top)
