@@ -1,68 +1,29 @@
 import sys
-from collections import deque
-input = sys.stdin.readline
 
-n = int(input())
+home = []
+N = int(input())
+for _ in range(N):
+    home.append([int(x) for x in sys.stdin.readline().rstrip().split()])
 
-board = [list(map(int, input().split())) for _ in range(n)]
+DP = [[[0 for _ in range(N)] for _ in range(N)] for _ in range(3)]
+# 0 가로, 1 세로, 2 대각선
 
-def solution():
-    ans = 0
-    q = deque()
-    q.append(((0, 1), 0))
-    while q:
-        (r2, c2), spin = q.popleft()
-        if spin == 0:
-            if (c2+1 < n) and (board[r2][c2+1] == 0):
-                if (r2, c2+1) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2, c2+1), 0))
-            else:
-                continue
-            if (r2+1 < n and board[r2+1][c2] + board[r2+1][c2+1] == 0):
-                if (r2+1, c2+1) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2+1, c2+1), 2))
-            else:
-                continue
-        elif spin == 1:
-            if (r2+1 < n) and (board[r2+1][c2] == 0):
-                if (r2+1, c2) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2+1, c2), 1))
-            else:
-                continue
-            if (c2+1 < n and board[r2][c2+1] + board[r2+1][c2+1] == 0):
-                if (r2+1, c2+1) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2+1, c2+1), 2))
-            else:
-                continue
-        else:
-            can1 = can2 = False
-            if (r2+1 < n) and (board[r2+1][c2] == 0):
-                if (r2+1, c2) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2+1, c2), 1))
-                can1 = True
-            if (c2+1 < n) and (board[r2][c2+1] == 0):
-                if (r2, c2+1) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2, c2+1), 0))
-                can2 = True
-            if (can1 and can2 and board[r2+1][c2+1] == 0):
-                if (r2+1, c2+1) == (n-1, n-1):
-                    ans += 1
-                else:
-                    q.append(((r2+1, c2+1), 2))
-            else:
-                continue
-    return ans
+DP[0][0][1] = 1
+for i in range(2,N):
+    if home[0][i] == 0:
+        DP[0][0][i] = DP[0][0][i - 1]
+#print(DP)
 
-print(solution())
+for i in range(1,N):
+    for j in range(1,N):
+        if home[i][j] == 0 and home[i][j - 1] == 0 and home[i - 1][j] == 0:
+            DP[2][i][j] = DP[0][i - 1][j - 1] + DP[1][i - 1][j - 1] + DP[2][i - 1][j - 1]
+            # 대각선 파이프 놓기
+
+        if home[i][j] == 0:
+            DP[0][i][j] = DP[0][i][j - 1] + DP[2][i][j - 1]
+            # 가로 파이프 놓기
+
+            DP[1][i][j] = DP[1][i - 1][j] + DP[2][i - 1][j]
+            # 세로 파이프 놓기
+print(DP[0][N - 1][N - 1] + DP[1][N - 1][N - 1] + DP[2][N - 1][N - 1])
