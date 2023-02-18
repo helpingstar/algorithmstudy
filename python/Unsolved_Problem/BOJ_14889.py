@@ -8,7 +8,6 @@ def solution():
     combis = list(combinations(range(n), n//2))
     ans = sys.maxsize
     for comb in combis[:len(combis)//2]:
-        print(comb)
         s_abil = 0
         l_abil = 0
         for i in range(n):
