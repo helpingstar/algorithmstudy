@@ -20,7 +20,7 @@ def bfs(x, y, visited):
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            
+
             if not (0 <= nx < N and 0 <= ny < N):
                 continue
             if visited[nx][ny]:
@@ -31,34 +31,29 @@ def bfs(x, y, visited):
                 visited[nx][ny] = True
                 q.append((nx, ny))
                 cnt += 1
-    return positions, populations // cnt, cnt
+    temp = populations // cnt
+    for x, y in positions:
+        board[x][y] = temp
+    return cnt
 
 def solution():
     count = 0
-    position_list = []
-    population_list = []
     for _ in range(2000):
         flag = False
         visited = [[False] * N for _ in range(N)]
         for r in range(N):
             for c in range(N):
                 if not visited[r][c]:
-                    positions, population, cnt = bfs(r, c, visited)
+                    cnt = bfs(r, c, visited)
                     if cnt > 1:
                         flag = True
-                    position_list.append(positions)
-                    population_list.append(population)
-        
+
         if not flag:
             return count
-        
-        for i in range(len(population_list)):
-            for r, c in position_list[i]:
-                board[r][c] = population_list[i]
         count += 1
 
         # print('-'*9)
         # print(*board, sep='\n')
         # print('-'*9)
-        
+
 print(solution())
