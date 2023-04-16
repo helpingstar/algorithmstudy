@@ -20,11 +20,9 @@ def solution():
         for i in comb:
             for j in comb:
                 s_abil += board[i][j]
-                s_abil += board[j][i]
         for i in not_comb:
             for j in not_comb:
                 l_abil += board[i][j]
-                l_abil += board[j][i]
         ans = min(ans, abs(s_abil - l_abil))
 
     return ans
