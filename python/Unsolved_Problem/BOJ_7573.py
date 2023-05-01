@@ -1,52 +1,36 @@
 import sys
 
 input = sys.stdin.readline
-dx = [0,1,0,-1]
-dy = [1,0,-1,0]
 
-n,l,m = map(int, input().split())
+N, L, F = map(int, input().split())
 
-fish = []
-answer = 0
-for _ in range(m):
-    x,y = map(int, input().split())
-    fish.append((x-1,y-1))
-def solv():
-    for sx,sy in fish:
-        for l1 in range(1,l//2):
-            l2 = l//2-l1
-            move_net(sx-l1, sy-l2, l1, l2)
-    print(answer)
+fishes = []
 
-def move_net(sx,sy,l1,l2):
-    global answer
-    d = 0
-    l1_cnt, l2_cnt = l1, l2
-    while d != 4:
-        if d in [1, 3]:
-            sx += dx[d]
-            l1_cnt -= 1
-            if l1_cnt == 0:
-                l1_cnt = l1
-                d += 1
-        else:
-            sy += dy[d]
-            l2_cnt -= 1
-            if l2_cnt == 0:
-                l2_cnt = l2
-                d += 1
-        if sx >= 0 and sy >= 0:
-            ex = sx + l1 + 1
-            ey = sy + l2 + 1
-            answer = max(answer, count_fish(sx, sy, ex, ey))
+for _ in range(F):
+    a, b = map(int, input().split())
+    fishes.append((a, b))
 
-def count_fish(sx,sy,ex,ey):
-    cnt = 0
-    if ex > n or ey > n:
-        return 0
-    for x,y in fish:
-        if sx <= x < ex and sy <= y < ey:
-            cnt += 1
-    return cnt
+ans = 1
 
-solv()
+
+def check(x, y):
+    result = 0
+    for w in range(1, N//2):
+        count = 0
+        h = N//2 - w
+
+        for f_x, f_y in fishes:
+            if x <= f_x <= x + h and y <= f_y <= y + w:
+                count += 1
+
+        result = max(result, count)
+
+    return result
+
+
+for i in range(F):
+    for j in range(F):
+        ans = max(ans, check(fishes[i][0], fishes[j][1]))
+
+
+print(ans)
