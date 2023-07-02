@@ -1,23 +1,30 @@
-word = input()
-bomb = input()
+import sys
 
-stack = []
 
-len_bomb = len(bomb)
+def solve():
+    input = sys.stdin.readline
+    word = input().rstrip()
+    bomb = input().rstrip()
+    bomb_list = list(bomb)
+    # 끝자리를 따로 저장하니까 속도 9% 감소
+    checker = bomb[-1]
+    q = []
 
-for c in word:
-    stack.append(c)
-    if c == bomb[-1]:
-        # To avoid out of index
-        if len(stack) >= len_bomb:
-            # check whether same or not
-            if stack[-len_bomb:] == list(bomb):
-                for _ in range(len_bomb):
-                    stack.pop()
+    for c in word:
+        q.append(c)
+        if len(q) >= len(bomb) and c == checker:
+            if q[-len(bomb):] == bomb_list:
+                # for _ in range(len(bomb)):
+                #     q.pop()
+                # 14% 감소
+                del q[-len(bomb):]
 
-result = ''.join(stack)
+    if len(q) == 0:
+        print("FRULA")
+    else:
+        print(''.join(q))
 
-if result:
-    print(result)
-else:
-    print('FRULA')
+
+# 전역 프로그램에서 함수로 바꾸니까 50% 감소
+if __name__ == "__main__":
+    solve()
