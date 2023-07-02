@@ -1,71 +1,65 @@
 import sys
 from collections import deque
 
-input = sys.stdin.readline
 
-dx = (-1, 1, 0, 0)
-dy = (0, 0, -1, 1)
-
-
-def solution():
+def solve():
+    input = sys.stdin.readline
     R, C = map(int, input().split())
-    fires = deque()
-    sang = deque()
-    board = []
-    step = 0
-    # visited = [[False] * C for _ in range(R)]
+
+    dx = (-1, 1, 0, 0)
+    dy = (0, 0, -1, 1)
+
+    board = [list(input().rstrip()) for _ in range(R)]
+
+    j_list = deque()
+    f_list = deque()
+
     for r in range(R):
-        line = list(input().rstrip())
-        board.append(line)
-        for c, v in enumerate(line):
-            if v == 'J':
-                # visited[r][c] = True
-                sang.append((r, c))
-            elif v == 'F':
-                fires.append((r, c))
+        for c in range(C):
+            if board[r][c] == 'J':
+                j_list.append((r, c))
+            if board[r][c] == 'F':
+                f_list.append((r, c))
 
-    while sang:
-        step += 1
-        new_sang = deque()
-        new_fires = deque()
+    cnt = 0
+    while True:
+        cnt += 1
 
-        while fires:
-            x, y = fires.popleft()
+        jn_list = deque()
+        fn_list = deque()
+
+        if not j_list:
+            return 'IMPOSSIBLE'
+        while j_list:
+            jx, jy = j_list.popleft()
+            if board[jx][jy] == 'F':
+                continue
             for i in range(4):
-                nx = x + dx[i]
-                ny = y + dy[i]
-                # print(nx, ny)
-                if not (0 <= nx < R and 0 <= ny < C):
+                jnx = jx + dx[i]
+                jny = jy + dy[i]
+                if not (0 <= jnx < R and 0 <= jny < C):
+                    return cnt
+                if board[jnx][jny] in {'F', '#', 'J'}:
                     continue
-                if board[nx][ny] in {'F', '#'}:
-                    continue
-                # print(f'[debug] fire nx ny {nx, ny}')
-                board[nx][ny] = 'F'
-                new_fires.append((nx, ny))
+                board[jnx][jny] = 'J'
+                jn_list.append((jnx, jny))
 
-        # for i in board:
-        #     print(*i)
+        j_list = jn_list
 
-        while sang:
-            x, y = sang.popleft()
-            # print(f'[debug] x, y : {x, y}')
+        while f_list:
+            fx, fy = f_list.popleft()
             for i in range(4):
-                nx = x + dx[i]
-                ny = y + dy[i]
-                if not (0 <= nx < R and 0 <= ny < C):
-                    # print(f'[debug] {nx, ny}')
-                    # for i in board:
-                    #     print(*i)
-                    return step
-                if board[nx][ny] in {'F', '#', 'J'}:
+                fnx = fx + dx[i]
+                fny = fy + dy[i]
+                if not (0 <= fnx < R and 0 <= fny < C):
                     continue
-                board[nx][ny] = 'J'
-                new_sang.append((nx, ny))
+                if board[fnx][fny] in {'F', '#'}:
+                    continue
+                board[fnx][fny] = 'F'
+                fn_list.append((fnx, fny))
 
-        fires = new_fires
-        sang = new_sang
-
-    return "IMPOSSIBLE"
+        f_list = fn_list
 
 
-print(solution())
+if __name__ == "__main__":
+    print(solve())
