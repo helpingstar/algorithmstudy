@@ -1,36 +1,38 @@
 import sys
-import bisect
-from collections import deque
 
 
 def solution():
-    INF = int(1e7)
-    
     input = sys.stdin.readline
     N, goal = map(int, input().split())
-    positions = list(map(int, input().split()))
-    steps = list(map(int, input().split()))
-    q = deque()
-    start_index = 0
-    steps_track = [INF] * N
-    
-    if positions[start_index] + steps[start_index] >= goal:
-        return 0
-    steps_track[start_index] = 0
-    q.append((0, start_index))
+    pos = list(map(int, input().split()))
+    step = list(map(int, input().split()))
 
-    while q:
-        step, idx = q.popleft()
-        if step > steps_track[idx]:
-            continue
-        next_idx = bisect.bisect_right(positions, positions[idx] + steps[idx])
-        # print(next_idx)
-        for i in range(next_idx-1, idx, -1):
-            if positions[i] + steps[i] >= goal:
-                return step + 1
-            if steps_track[i] > step + 1:
-                steps_track[i] = step + 1
-                q.append((step + 1, i))
+    roads = [(pos[i], pos[i] + step[i]) for i in range(N)]
+
+    cnt = 0
+    limit = pos[0] + step[0]
+    next_ = 0
+
+    if goal <= limit:
+        return 0
+
+    for s, e in roads:
+        if s <= limit:
+            next_ = max(e, next_)
+        else:
+            if goal <= next_:
+                return cnt + 1
+
+            if s <= next_:
+                limit = next_
+                cnt += 1
+                next_ = e
+            else:
+                return -1
+
+    if goal <= next_:
+        return cnt + 1
+
     return -1
 
 
