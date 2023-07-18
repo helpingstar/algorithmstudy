@@ -1,61 +1,49 @@
 import sys
-from collections import defaultdict
-
-NEXT = {
-    'N' : (1, 0),
-    'E' : (0, 1),
-    'W' : (0, -1),
-    'S' : (-1, 0)
-}
-
-ROTATE_R = 'NESW'
-ROTATE_L = 'NWSE'
 
 input = sys.stdin.readline
 
-width, height = map(int, input().split())
-
-board = [[0 for _ in range(width+1)] for _ in range(height+1)]
-
-n_robot, n_oper = map(int, input().split())
-
-robot_dir = ['']
-robot_pos = [[]]
-
-for i in range(1, n_robot+1):
-    c, r, dir = input().split()
-    c, r = int(c), int(r)
-    board[r][c] = i
-    robot_dir.append(dir)
-    robot_pos.append([r, c])
-
 def solution():
-    operations = []
-    for _ in range(n_oper):
-        robot, oper, iter = input().split()
-        operations.append([int(robot), oper, int(iter)])
-    for robot, oper, iter in operations:
-        if oper == 'F':
-            for _ in range(iter):
-                r, c = robot_pos[robot]
-                dx, dy = NEXT[robot_dir[robot]]
-                nr, nc = r + dx, c + dy
+    C, R = map(int, input().split())
+    N, M = map(int, input().split())
 
-                if not (0 < nc <= width and 0 < nr <= height):
-                    return f'Robot {robot} crashes into the wall'
+    board = [[0] * C for _ in range(R)]
+    robots = [[-1, -1, 'O'] for _ in range(N + 1)]
+    NEWS = ["N", "W", "S", "E"]
+    NEWS_index = {"N": 0, "W": 1, "S": 2, "E": 3}
+    delta = {"N": (-1, 0), "W": (0, -1), "S": (1, 0), "E": (0, 1)}
 
-                if board[nr][nc]:
-                    return f'Robot {robot} crashes into robot {board[nr][nc]}'
+    for i in range(N):
+        x, y, way = input().split()
+        x = int(x) - 1
+        y = R - int(y)
+        robots[i + 1] = [y, x, way]
+        board[y][x] = i + 1
 
-                robot_pos[robot] = [nr, nc]
-                board[r][c] = 0
-                board[nr][nc] = robot
+    orders = []
+    for _ in range(M):
+        robot, order, repeat = input().split()
+        orders.append((int(robot), order, int(repeat)))
 
+    for robot, order, repeat in orders:
+        if order == "L":
+            way = robots[robot][2]
+            robots[robot][2] = NEWS[(NEWS_index[way] + repeat) % 4]
+        elif order == "R":
+            way = robots[robot][2]
+            robots[robot][2] = NEWS[(NEWS_index[way] - repeat) % 4]
         else:
-            if oper == 'R':
-                robot_dir[robot] = ROTATE_R[(ROTATE_R.find(robot_dir[robot]) + iter) % 4]
-            else:
-                robot_dir[robot] = ROTATE_L[(ROTATE_L.find(robot_dir[robot]) + iter) % 4]
-    return 'OK'
+            robot_r, robot_c, way = robots[robot]
+            board[robot_r][robot_c] = 0
+            dr, dc = delta[way]
+            for _ in range(repeat):
+                robot_r += dr
+                robot_c += dc
+                if not (0 <= robot_r < R and 0 <= robot_c < C):
+                    return f"Robot {robot} crashes into the wall"
+                if board[robot_r][robot_c] != 0:
+                    return f"Robot {robot} crashes into robot {board[robot_r][robot_c]}"
+            robots[robot] = [robot_r, robot_c, way]
+
+    return "OK"
 
 print(solution())
