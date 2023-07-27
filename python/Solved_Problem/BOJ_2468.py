@@ -1,44 +1,53 @@
 import sys
 from collections import deque
+
 input = sys.stdin.readline
 
-n = int(input())
 
-dx = (-1, 1, 0, 0)
-dy = (0, 0, -1, 1)
+def solution():
+    dx = (-1, 1, 0, 0)
+    dy = (0, 0, -1, 1)
+    N = int(input())
+    n_max = 0
+    n_min = 101
+    board = []
+    for _ in range(N):
+        line = list(map(int, input().split()))
+        n_max = max(n_max, max(line))
+        n_min = min(n_min, min(line))
+        board.append(line)
+    safe_max = 1
 
-board = []
-nums = set()
-for _ in range(n):
-    line = list(map(int, input().split()))
-    board.append(line)
-    nums |= set(line)
+    for w in range(n_min, n_max):
+        visited = [[False] * N for _ in range(N)]
+        safe_count = 0
+        q = deque()
+        for r in range(N):
+            for c in range(N):
+                if visited[r][c]:
+                    continue
+                if board[r][c] > w:
+                    visited[r][c] = True
+                    q.append((r, c))
+                    safe_count += 1
+                    while q:
+                        x, y = q.popleft()
+                        for i in range(4):
+                            nx = x + dx[i]
+                            ny = y + dy[i]
 
-def bfs(x, y, visited:set, water):
-    visited.add((x, y))
-    q = deque()
-    q.append((x, y))
-    while q:
-        x, y = q.popleft()
-        for i in range(4):
-            nx = x + dx[i]
-            ny = y + dy[i]
-            if not (0 <= nx < n and 0 <= ny < n):
-                continue
-            if (nx, ny) in visited:
-                continue
-            if board[nx][ny] > water:
-                visited.add((nx, ny))
-                q.append((nx, ny))
-ans = 1
-for water in nums:
-    visited = set()
-    count = 0
-    for r in range(n):
-        for c in range(n):
-            if board[r][c] > water and (r, c) not in visited:
-                bfs(r, c, visited, water)
-                count += 1
-    ans = max(ans, count)
+                            if not (0 <= nx < N and 0 <= ny < N):
+                                continue
+                            if visited[nx][ny]:
+                                continue
+                            if board[nx][ny] <= w:
+                                continue
 
-print(ans)
+                            q.append((nx, ny))
+                            visited[nx][ny] = True
+        safe_max = max(safe_max, safe_count)
+    print(safe_max)
+    return
+
+
+solution()
