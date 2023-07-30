@@ -1,20 +1,26 @@
 import sys
 
-input = sys.stdin.readline
 
-n = int(input())
+def solution():
+    input = sys.stdin.readline
+    N = int(input())
 
-first = int(input())
+    waters = [int(input()) for _ in range(N)]
 
-window1 = [0, first, 0]
-window2 = [0, 0, 0]
-for _ in range(n-1):
-    temp = int(input())
-    window2 = [0, 0, 0]
-    # print(window1)
-    window2[0] = max(window1)
-    window2[1], window2[2] = window1[0] + temp, window1[1] + temp
-    # print(window2)
-    window1 = window2
+    if N == 1:
+        return waters[0]
+    elif N == 2:
+        return sum(waters)
+    elif N == 3:
+        return sum(waters) - min(waters)
 
-print(max(window1))
+    dp = [waters[0]+waters[1], waters[0]+waters[2], waters[1]+waters[2]]
+    for i in range(3, N):
+        a = max(dp)
+        b = dp[0] + waters[i]
+        c = dp[1] + waters[i]
+        dp = [a, b, c]
+    return max(dp)
+
+
+print(solution())
