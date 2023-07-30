@@ -1,37 +1,40 @@
 import sys
 
-input = sys.stdin.readline
+sys.setrecursionlimit(10**6)
 
-n, m = map(int, input().split())
-n_max = 0
-ans = set()
-graph = [[] for _ in range(n+1)]
+def solution():
+    input = sys.stdin.readline
 
-visited = [False] * (n+1)
+    N, M = map(int, input().split())
+    graph = [[] for _ in range(N + 1)]
+    for _ in range(M):
+        a, b = map(int, input().split())
+        graph[b].append(a)
 
-for _ in range(m):
-    a, b = map(int, input().split())
+    visited = [False] * (N+1)
+    hacking = [1] * (N + 1)
 
-    graph[b].append(a)
+    def dfs(now):
+        if visited[now]:
+            return hacking[now]
+        visited[now] = True
+        result = 1
+        for nxt in graph[now]:
+            result += dfs(nxt)
+        hacking[now] = result
+        return result
 
-def dfs(origin, x, count):
-    global n_max
-    global ans
-    # print(f'[debug]  origin, x, count: {origin, x, count}')
-    if count > n_max:
-        n_max = count
-        ans = {origin}
-    elif count == n_max:
-        ans.add(origin)
+    for i in range(1, N+1):
+        dfs(i)
 
-    for nxt in graph[x]:
-        visited[nxt] = True
-        dfs(origin, nxt, count+1)
-        visited[nxt] = False
+    n_max = 0
+    ans = []
+    for i in range(1, N+1):
+        if hacking[i] > n_max:
+            n_max = hacking[i]
+            ans = [i]
+        elif hacking[i] == n_max:
+            ans.append(i)
+    print(*sorted(ans))
 
-for i in range(1, n+1):
-    visited[i] = True
-    dfs(i, i, 1)
-    visited[i] = False
-
-print(*sorted(ans))
+solution()
