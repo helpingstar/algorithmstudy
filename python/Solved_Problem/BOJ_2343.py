@@ -1,27 +1,37 @@
-n, m = map(int, input().split())
-length_list = list(map(int, input().split()))
+import sys
+input = sys.stdin.readline
 
-first = max(length_list)
-last = sum(length_list)
 
-def can_make(list, length, m):
-    norm = 0
-    bluray_num = 1
-    for num in list:
-        if (norm + num) > length:
-            bluray_num += 1
-            norm = num
+def solution():
+    N, M = map(int, input().split())
+    nums = list(map(int, input().split()))
+    left = 0
+    right = sum(nums)
+
+    def check(mid):
+        nonlocal nums
+        nonlocal M
+        sum_ = 0
+        cnt = 1
+        for num in nums:
+            if num > mid:
+                return False
+            sum_ += num
+            if sum_ > mid:
+                cnt += 1
+                if cnt > M:
+                    return False
+                sum_ = num
+        return True
+    ans = -1
+    while left <= right:
+        mid = (left + right) // 2
+        if check(mid):
+            ans = mid
+            right = mid - 1
         else:
-            norm += num
-        if bluray_num > m:
-            return False
-    return True
+            left = mid + 1
+    print(ans)
 
-while first < last:
-    mid = (first + last) // 2
-    if can_make(length_list, mid, m):
-        last = mid
-    else:
-        first = mid + 1
-        
-print(first)
+
+solution()

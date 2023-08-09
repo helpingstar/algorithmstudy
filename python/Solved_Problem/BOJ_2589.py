@@ -1,40 +1,44 @@
 import sys
-
-input = sys.stdin.readline
 from collections import deque
 
-dx = (-1, 1, 0, 0)
-dy = (0, 0, -1, 1)
+input = sys.stdin.readline
 
-R, C = map(int, input().split())
 
-board = [list(input().rstrip()) for _ in range(R)]
+def solution():
+    ROW, COL = map(int, input().split())
+    board = [list(input().rstrip()) for _ in range(ROW)]
 
-def bfs(x, y):
-    visited = set()
-    visited.add((x, y))
-    q = deque()
-    q.append((x, y, 0))
+    dx = (-1, 1, 0, 0)
+    dy = (0, 0, -1, 1)
 
-    while q:
-        x, y, step = q.popleft()
-        for i in range(4):
-            nx = x + dx[i]
-            ny = y + dy[i]
+    visited = [[0] * COL for _ in range(ROW)]
 
-            if not (0 <= nx < R and 0 <= ny < C):
-                continue
-            if (nx, ny) in visited:
-                continue
-            if board[nx][ny] == 'W':
-                continue
-            q.append((nx, ny, step+1))
-            visited.add((nx, ny))
-    return step
-ans = 0
-for r in range(R):
-    for c in range(C):
-        if board[r][c] == 'L':
-            ans = max(ans, bfs(r, c))
+    def bfs(x, y, v):
+        nonlocal board, dx, dy, visited
+        q = deque([(x, y, 0)])
+        visited[x][y] += 1
+        while q:
+            x, y, dist = q.popleft()
+            for i in range(4):
+                nx = x + dx[i]
+                ny = y + dy[i]
+                if not (0 <= nx < ROW and 0 <= ny < COL):
+                    continue
+                if board[nx][ny] == "W":
+                    continue
+                if visited[nx][ny] == v:
+                    continue
 
-print(ans)
+                visited[nx][ny] += 1
+                q.append((nx, ny, dist + 1))
+        return dist
+
+    result = 0
+    for x in range(ROW):
+        for y in range(COL):
+            if board[x][y] == "L":
+                result = max(result, bfs(x, y, visited[x][y]+1))
+    print(result)
+
+
+solution()
