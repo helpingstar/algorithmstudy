@@ -1,64 +1,59 @@
 import sys
-
+from itertools import combinations
 input = sys.stdin.readline
 
-target = int(input())
-n_a = int(input())
-a_list = list(map(int, input().split()))
-n_b = int(input())
-b_list = list(map(int, input().split()))
 
-a_temp = []
-a_sum = []
-temp = 0
+def solution():
+    target = int(input())
+    n_A = int(input())
+    a_list = list(map(int, input().split()))
+    n_B = int(input())
+    b_list = list(map(int, input().split()))
+    a_sum = [0]
+    b_sum = [0]
 
-for a in a_list:
-    temp += a
-    a_sum.append(temp)
-    a_temp.append(temp)
-    
-for i in range(n_a-1):
-    for j in range(i+1, n_a):
-        a_sum.append(a_temp[j] - a_temp[i])
+    for i in range(n_A):
+        a_sum.append(a_sum[-1] + a_list[i])
 
-b_temp = []
-b_sum = []
-temp = 0
+    for i in range(n_B):
+        b_sum.append(b_sum[-1] + b_list[i])
+    a_sub = []
+    for i in range(n_A):
+        for j in range(i+1, n_A+1):
+            a_sub.append(a_sum[j] - a_sum[i])
 
-for b in b_list:
-    temp += b
-    b_sum.append(temp)
-    b_temp.append(temp)
+    b_sub = []
+    for i in range(n_B):
+        for j in range(i+1, n_B+1):
+            b_sub.append(b_sum[j] - b_sum[i])
 
-for i in range(n_b-1):
-    for j in range(i+1, n_b):
-        b_sum.append(b_temp[j] - b_temp[i])
+    a_sub.sort()
+    b_sub.sort()
 
-a_sum.sort()
-b_sum.sort()
+    a_cur = 0
+    b_cur = len(b_sub)-1
 
-a_cur, b_cur = 0, len(b_sum)-1
+    ans = 0
 
-ans = 0
+    while a_cur < len(a_sub) and b_cur >= 0:
+        temp = a_sub[a_cur] + b_sub[b_cur]
+        if temp < target:
+            a_cur += 1
+        elif temp > target:
+            b_cur -= 1
+        else:
+            a_cnt = 1
+            b_cnt = 1
+            while a_cur < len(a_sub) - 1 and a_sub[a_cur] == a_sub[a_cur+1]:
+                a_cnt += 1
+                a_cur += 1
+            while b_cur > 0 and b_sub[b_cur] == b_sub[b_cur-1]:
+                b_cnt += 1
+                b_cur -= 1
+            a_cur += 1
+            b_cur -= 1
+            ans += (a_cnt * b_cnt)
+    print(ans)
 
-# print(f'debug  {a_sum}')
-# print(f"debug  {b_sum}")
 
-while a_cur < len(a_sum) and 0 <= b_cur:
-    # print(f'[debug] a_cur : {a_cur}, b_cur : {b_cur}')
-    if a_sum[a_cur] + b_sum[b_cur] < target:
-        a_cur += 1
-    elif a_sum[a_cur] + b_sum[b_cur] > target:
-        b_cur -= 1
-    else:
-        a_next = a_cur + 1
-        while a_next < len(a_sum) and a_sum[a_cur] == a_sum[a_next]:
-            a_next += 1
-        b_next = b_cur - 1
-        while b_next >= 0 and b_sum[b_cur] == b_sum[b_next]:
-            b_next -= 1
-        # print(f'[debug]        {a_next} - {a_cur}  |  {b_cur} - {b_next}')
-        ans += (a_next - a_cur) * (b_cur - b_next)
-        a_cur = a_next
-        b_cur = b_next
-print(ans)
+solution()

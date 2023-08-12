@@ -1,27 +1,47 @@
 import sys
-
 input = sys.stdin.readline
 
-n = int(input())
 
-liquid = list(map(int, input().split()))
+def solution():
+    N = int(input())
+    nums = list(map(int, input().split()))
+    nums.sort()
 
-l, r = 0, n-1
+    if nums[-2] == 0 or nums[-1] < 0:
+        print(nums[-2], nums[-1])
+        return
 
-liquid.sort()
+    if nums[1] == 0 or nums[0] > 0:
+        print(nums[0], nums[1])
+        return
 
-result = 3000000000
-r_l, r_r = -1, -1
-while l < r:
-    if liquid[l] + liquid[r] == 0:
-        r_l, r_r = l, r
-        break
-    if abs(liquid[l] + liquid[r]) < result:
-        r_l, r_r = l, r
-        result = abs(liquid[l] + liquid[r])
-    if liquid[l] + liquid[r] < 0:
-        l += 1
-    else:
-        r -= 1
+    if nums[0] == 0:
+        print(0, nums[1])
+        return
 
-print(liquid[r_l], liquid[r_r])
+    if nums[-1] == 0:
+        print(nums[-2], 0)
+        return
+
+    l, r = 0, N-1
+    result = float('inf')
+    la = -1
+    ra = -1
+    while l < r:
+        sum_ = nums[l] + nums[r]
+        if abs(sum_) < result:
+            result = abs(sum_)
+            la = l
+            ra = r
+        if sum_ < 0:
+            l += 1
+        elif sum_ > 0:
+            r -= 1
+        else:
+            print(nums[l], nums[r])
+            return
+    print(nums[la], nums[ra])
+    return
+
+
+solution()
