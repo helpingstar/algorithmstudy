@@ -1,48 +1,48 @@
 import sys
 from collections import deque
 
-n = int(sys.stdin.readline().rstrip())
-matrix = []
-for _ in range(n):
-    matrix.append(list(map(int, sys.stdin.readline().rstrip())))
-    
-queue = deque()
-dx = [-1, 1, 0, 0]
-dy = [0, 0, -1, 1]
 
-def bfs(x, y):
-    if not (0 <= x < n and 0 <= y < n):
-        return False
-    if matrix[x][y] == 0:
-        return False
-    count = 1
-    queue.append((x, y))
-    while queue:
-        a, b = queue.popleft()
-        matrix[a][b] = 0
-        for i in range(4):
-            nx = a + dx[i]
-            ny = b + dy[i]
-            
-            if not (0 <= nx < n and 0 <= ny < n):
-                continue
-            if matrix[nx][ny] == 0:
-                continue
-            matrix[nx][ny] = 0
-            count += 1
-            queue.append((nx, ny))
-    return count
+def solution():
+    input = sys.stdin.readline
 
-house_list = []
+    dx = (-1, 1, 0, 0)
+    dy = (0, 0, -1, 1)
 
-for i in range(n):
-    for j in range(n):
-        result = bfs(i, j)
-        if result:
-            house_list.append(result)
-            
-house_list.sort()
+    N = int(input())
+    board = [list(input().rstrip()) for _ in range(N)]
+    visited = [[False] * N for _ in range(N)]
 
-print(len(house_list))
-for house in house_list:
-    print(house)
+    def bfs(x, y):
+        q = deque()
+        q.append((x, y))
+        visited[x][y] = True
+        cnt = 1
+        while q:
+            x, y = q.popleft()
+
+            for i in range(4):
+                nx = x + dx[i]
+                ny = y + dy[i]
+
+                if not (0 <= nx < N and 0 <= ny < N):
+                    continue
+                if visited[nx][ny]:
+                    continue
+                if board[nx][ny] == '0':
+                    continue
+
+                q.append((nx, ny))
+                visited[nx][ny] = True
+                cnt += 1
+        return cnt
+    ans = []
+    for r in range(N):
+        for c in range(N):
+            if board[r][c] == '1' and not visited[r][c]:
+                ans.append(bfs(r, c))
+
+    print(len(ans))
+    print(*sorted(ans), sep='\n')
+
+
+solution()
