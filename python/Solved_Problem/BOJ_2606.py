@@ -1,33 +1,40 @@
 import sys
-from collections import deque
 
-n = int(sys.stdin.readline().rstrip())
-m = int(sys.stdin.readline().rstrip())
+input = sys.stdin.readline
 
-com = {}
 
-for i in range(1, n+1):
-    com[i] = []
+def find(parent, x):
+    if parent[x] != x:
+        parent[x] = find(parent, parent[x])
+    return parent[x]
 
-for _ in range(m):
-    a, b = map(int, sys.stdin.readline().split())
-    com[a].append(b)
-    com[b].append(a)
 
-entered = [False] * (n + 1)
-# entered[1] = True
-def bfs():
-    count = 0
-    queue = deque()
-    queue.append(1)
-    while queue:
-        t = queue.popleft()
-        for i in com[t]:
-            if entered[i]:
-                continue
-            queue.append(i)
-            entered[i] = True
-            count += 1
-    return count
+def union(parent, a, b):
+    a = find(parent, a)
+    b = find(parent, b)
 
-print(bfs() - 1)
+    if a <= b:
+        parent[b] = a
+    else:
+        parent[a] = b
+
+
+def solution():
+    n_pc = int(input())
+    n_con = int(input())
+
+    parent = [i for i in range(n_pc + 1)]
+
+    for _ in range(n_con):
+        a, b = map(int, input().split())
+
+        union(parent, a, b)
+    result = 0
+    for i in range(2, n_pc+1):
+        if find(parent, i) == 1:
+            result += 1
+
+    print(result)
+
+
+solution()
