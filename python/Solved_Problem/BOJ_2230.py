@@ -1,32 +1,41 @@
-"""
-이분 탐색으로 풀었다.
-어떤 A숫자와 차이가 M인 숫자중 가장 작은 숫자를 고르려면
-정렬된 배열에서 A+M의 인덱스를 찾으면 된다. 해당 인덱스가 A의 인덱스보다 작거나
-배열의 크기를 넘어갈 경우 더 이상 탐색할 필요가 없다.
-"""
-
-
 import sys
-import bisect
-input = sys.stdin.readline
 
-n, diff = map(int, input().split())
-nums = []
 
-for _ in range(n):
-    inum = int(input())
-    nums.append(inum)
+def solution():
+    input = sys.stdin.readline
 
-nums.sort()
+    N, M = map(int, input().split())
+    nums = [int(input()) for _ in range(N)]
+    nums = list(set(nums))
 
-ans = 10e9
+    if M == 0:
+        return 0
 
-for i in range(n):
-    target = diff + nums[i]
-    idx_tar = bisect.bisect_left(nums, target)
-    if idx_tar < i or idx_tar >= n:
-        break
-    if nums[idx_tar] - nums[i] < ans:
-        ans = nums[idx_tar] - nums[i]
+    nums.sort()
 
-print(ans)
+    l, r = 0, 1
+    result = float("inf")
+    while l <= r and r < len(nums):
+        temp = nums[r] - nums[l]
+        if temp == M:
+            return M
+        elif temp > M:
+            l += 1
+            result = min(temp, result)
+        else:
+            r += 1
+    return result
+
+
+print(solution())
+
+"""
+7 4
+1
+8
+15
+16
+17
+18
+22
+"""
