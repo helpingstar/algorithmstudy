@@ -49,7 +49,6 @@ def solution():
                 delta = 0
             else:
                 delta = 1
-            board[r][c] = deque()
             for i in range(4):
                 board[r][c].append((new_m, new_s, 2 * i + delta))
             count[r][c] = 4
@@ -89,7 +88,6 @@ def solution():
                     delta = 0
                 else:
                     delta = 1
-                board[r][c] = deque()
                 for i in range(4):
                     board[r][c].append((new_m, new_s, 2 * i + delta))
                 new_count[r][c] = 4
