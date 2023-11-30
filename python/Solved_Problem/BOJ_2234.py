@@ -45,7 +45,7 @@ def solution():
             size_list.append(size)
             cnt += 1
 
-
+    
     conn_set = set()
 
     for r in range(n_row):
